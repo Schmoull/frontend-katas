@@ -1,0 +1,11 @@
+services:
+  web:
+    build: .
+    user: "root"
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "5173:5173"
+      - "24678:24678"
+    command: sh -lc "npm run dev -- --host"
