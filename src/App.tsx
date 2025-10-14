@@ -1,54 +1,62 @@
-import { useState } from "react";
-import Button from "./components/Button";
-import Card from "./components/Card";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import CreateCamp from "./pages/CreateCamp";
+import Camp from "./pages/Camp";
+import CampDetails from "./pages/CampDetails";
+import Profile from "./pages/Profile";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 export default function App() {
-  const [loading, setLoading] = useState(false);
-
-  const handleClick = () => {
-    setLoading(true);
-    setTimeout(() => setLoading(false), 2000);
-  };
-
   return (
-    <main className="min-h-screen grid place-items-center bg-gray-100 text-gray-900">
-      <div className="space-y-4 text-center">
-        <h1 className="text-4xl font-bold">Composant Button</h1>
+    <Routes>
+      {/* Si on arrive sur la racine, on redirige */}
+      <Route path="/" element={<Navigate to="/login" />} />
 
-        <Button onClick={handleClick} loading={loading}>
-          {loading ? "Chargement..." : "Cliquer"}
-        </Button>
+      {/* Route publique */}
+      <Route path="/login" element={<Login />} />
 
-        <Button disabled>
-          Désactivé
-        </Button>
-      </div>
-
-      <div className="mx-auto max-w-5xl p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Card
-          title="Veste denim vintage"
-          description="Coupe droite, années 90. Tissu épais, surpiqûres contrastées."
-          imageSrc="https://images.unsplash.com/photo-1516826957135-700dedea698c?q=80&w=1200&auto=format&fit=crop"
-          imageAlt="Veste en jean posée sur fond neutre"
-          actions={
-            <>
-              <Button onClick={() => alert('Détails')}>Détails</Button>
-              <Button disabled>Ajouter</Button>
-            </>
-          }
-        />
-
-        <Card
-          title="Carte sans image"
-          description="Exemple minimal : titre + description + (facultatif) actions."
-          actions={<Button onClick={() => alert('OK')}>OK</Button>}
-        />
-
-        <Card
-          title="Juste un titre"
-          // description et actions omises volontairement
-        />
-      </div>
-    </main>
+      {/* Routes protégées */}
+      <Route
+        path="/home"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/create-camp"
+        element={
+          <ProtectedRoute>
+            <CreateCamp />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/camp/:id"
+        element={
+          <ProtectedRoute>
+            <Camp />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/camp/:id/details"
+        element={
+          <ProtectedRoute>
+            <CampDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }

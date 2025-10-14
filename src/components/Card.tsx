@@ -9,6 +9,7 @@ import React from "react";
  */
 type CardProps = {
   title: string;
+  infoDate?: string;
   description?: string;
   imageSrc?: string;
   imageAlt?: string;
@@ -17,6 +18,7 @@ type CardProps = {
 
 export default function Card({
   title,
+  infoDate,
   description,
   imageSrc,
   imageAlt,
@@ -37,6 +39,12 @@ export default function Card({
 
       <div className="p-4">
         <h3 className="text-lg font-semibold">{title}</h3>
+
+        {infoDate && (
+          <p className="mt-1 text-sm text-gray-600">
+            {infoDate}
+          </p>
+        )}
 
         {description && (
           <p className="mt-1 text-sm text-gray-600">
