@@ -5,7 +5,13 @@ import CreateCamp from "./pages/CreateCamp";
 import Camp from "./pages/Camp";
 import CampDetails from "./pages/CampDetails";
 import Profile from "./pages/Profile";
+import CampDashboard from "./pages/CampDashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import CampObjectives from "./pages/CampObjectives";
+import CampFilRouge from "./pages/CampFilRouge";
+import CampPlanning from "./pages/CampPlanning";
+import CampActivites from "./pages/CampActivites";
+import CampSettings from "./pages/CampSettings";
 
 export default function App() {
   return (
@@ -54,6 +60,54 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/camp/:id/dashboard"
+        element={
+          <ProtectedRoute>
+            <CampDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/camp/:id/objectifs"
+        element={
+          <ProtectedRoute>
+            <CampObjectives />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/camp/:id/fil-rouge"
+        element={
+          <ProtectedRoute>
+            <CampFilRouge />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/camp/:id/planning"
+        element={
+          <ProtectedRoute>
+            <CampPlanning />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/camp/:id/activites"
+        element={
+          <ProtectedRoute>
+            <CampActivites />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/camp/:id/parametres"
+        element={
+          <ProtectedRoute>
+            <CampSettings />
           </ProtectedRoute>
         }
       />
