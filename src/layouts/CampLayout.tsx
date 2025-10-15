@@ -66,7 +66,7 @@ export default function CampLayout({ children }: CampLayoutProps) {
                 }`
               }
             >
-              📅 Planning
+              📅 Picassos
             </NavLink>
 
             <NavLink

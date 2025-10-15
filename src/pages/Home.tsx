@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import Card from "../components/Card";
 import { Link } from "react-router-dom";
+import { supabase } from "../lib/supabaseClient";
 
 type Camp = {
   id: number;
   name: string;
-  startDate: string;
-  endDate: string;
+  start_date: string;
+  end_date: string;
   groupe: string;
-  unite: string;
+  unite:  string;
   responsable: string;
   location: string;
   theme: string;
@@ -18,11 +19,31 @@ type Camp = {
 
 export default function Home() {
   const [camps, setCamps] = useState<Camp[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // 🔹 Charger les camps depuis le localStorage au démarrage
+  // 🔹 Charger les camps depuis Supabase
   useEffect(() => {
-    const storedCamps = JSON.parse(localStorage.getItem("camps") || "[]");
-    setCamps(storedCamps);
+    async function fetchCamps() {
+      setLoading(true);
+      setError(null);
+
+      const { data, error } = await supabase
+        .from("camps")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if (error) {
+        console.error("❌ Erreur lors du chargement :", error);
+        setError("Impossible de charger les camps pour le moment.");
+      } else {
+        setCamps(data || []);
+      }
+
+      setLoading(false);
+    }
+
+    fetchCamps();
   }, []);
 
   return (
@@ -32,23 +53,22 @@ export default function Home() {
           <h1 className="text-2xl font-bold text-gray-900">Mes camps</h1>
         </header>
 
-        {/* Si aucun camp */}
-        {camps.length === 0 ? (
-          <p className="text-gray-600">
-            Aucun camp pour le moment. Crée ton premier camp via le menu à
-            gauche.
-          </p>
+        {loading ? (
+          <p className="text-gray-600">Chargement…</p>
+        ) : error ? (
+          <p className="text-red-600">{error}</p>
+        ) : camps.length === 0 ? (
+          <p className="text-gray-600">Aucun camp pour le moment.</p>
         ) : (
-          // 🔹 Liste des camps en cartes
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {camps.map((camp) => (
               <Card
                 key={camp.id}
                 title={camp.name}
-                infoDate={"Débute le : " + camp.startDate}
+                infoDate={`Débute le : ${camp.start_date}`}
                 description={camp.description}
                 imageSrc="/assets/img/default-camp.png"
-                imageAlt="Image par défaut d’un camp"
+                imageAlt={`Image du camp ${camp.name}`}
                 actions={
                   <>
                     <Link

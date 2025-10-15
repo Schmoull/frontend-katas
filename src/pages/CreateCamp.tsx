@@ -1,8 +1,8 @@
 import { useState } from "react";
 import MainLayout from "../layouts/MainLayout";
+import { supabase } from "../lib/supabaseClient";
 
 export default function CreateCamp() {
-  // États pour stocker les valeurs du formulaire
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -12,15 +12,19 @@ export default function CreateCamp() {
   const [location, setLocation] = useState("");
   const [theme, setTheme] = useState("");
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage("");
 
+    // ⚙️ Création de l’objet camp
     const newCamp = {
-      id: Date.now(),
       name,
-      startDate,
-      endDate,
+      start_date: startDate,
+      end_date: endDate,
       groupe,
       unite,
       responsable,
@@ -29,23 +33,27 @@ export default function CreateCamp() {
       description,
     };
 
-    // Pour l’instant, on stocke simplement dans le localStorage
-    const camps = JSON.parse(localStorage.getItem("camps") || "[]");
-    camps.push(newCamp);
-    localStorage.setItem("camps", JSON.stringify(camps));
+    // 📤 Envoi à Supabase
+    const { error } = await supabase.from("camps").insert([newCamp]);
 
-    // Réinitialise le formulaire
-    setName("");
-    setStartDate("");
-    setEndDate("");
-    setGroupe("");
-    setUnite("");
-    setResponsable("");
-    setLocation("");
-    setTheme("");
-    setDescription("");
+    if (error) {
+      console.error("❌ Erreur Supabase :", error);
+      setMessage("Erreur : impossible de créer le camp.");
+    } else {
+      setMessage("✅ Camp créé avec succès !");
+      // Réinitialise le formulaire
+      setName("");
+      setStartDate("");
+      setEndDate("");
+      setGroupe("");
+      setUnite("");
+      setResponsable("");
+      setLocation("");
+      setTheme("");
+      setDescription("");
+    }
 
-    alert("Camp créé avec succès !");
+    setLoading(false);
   };
 
   return (
@@ -122,7 +130,7 @@ export default function CreateCamp() {
             />
           </div>
 
-          {/* Unite */}
+          {/* Unité */}
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="unite">
               Unité
@@ -137,10 +145,10 @@ export default function CreateCamp() {
             />
           </div>
 
-          {/* Responsable du camp */}
+          {/* Responsable */}
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="responsable">
-              Responsable du camp
+              Responsable
             </label>
             <input
               id="responsable"
@@ -194,20 +202,40 @@ export default function CreateCamp() {
               id="description"
               className="w-full rounded-md border border-gray-300 p-2 min-h-[100px]"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Décris brièvement ton camp..."
+
+              onChange={(e) => {
+                if (e.target.value.length <= 2500){
+                  setDescription(e.target.value);
+                }
+              }}
+              maxLength={2500}
+              placeholder="Décris brièvement ton camp... (max 5000 caractères)"
               required
             />
+            <div className="text-right text-sm text-gray-500 mt-1">
+              {description.length}/2500 caractères
+            </div>
           </div>
 
           {/* Bouton */}
-          <div className="pt-4">
+          <div className="pt-4 flex items-center justify-between">
             <button
               type="submit"
-              className="bg-indigo-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-indigo-700 transition"
+              disabled={loading}
+              className="bg-indigo-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-indigo-700 transition disabled:opacity-50"
             >
-              Enregistrer le camp
+              {loading ? "Création..." : "Enregistrer le camp"}
             </button>
+
+            {message && (
+              <span
+                className={`text-sm ${
+                  message.startsWith("✅") ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {message}
+              </span>
+            )}
           </div>
         </form>
       </section>

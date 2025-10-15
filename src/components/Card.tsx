@@ -16,6 +16,10 @@ type CardProps = {
   actions?: React.ReactNode; // Contenu React libre: texte, <button>, <a>, etc.
 };
 
+function truncate(text: string, max: number) {
+  return text.length > max ? text.slice(0, max) + "…" : text;
+}
+
 export default function Card({
   title,
   infoDate,
@@ -48,7 +52,7 @@ export default function Card({
 
         {description && (
           <p className="mt-1 text-sm text-gray-600">
-            {description}
+            {truncate(description, 120)}
           </p>
         )}
 
