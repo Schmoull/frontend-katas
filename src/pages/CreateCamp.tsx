@@ -12,6 +12,8 @@ export default function CreateCamp() {
   const [location, setLocation] = useState("");
   const [theme, setTheme] = useState("");
   const [description, setDescription] = useState("");
+  const [dayStartTime, setDayStartTime] = useState("");
+  const [dayEndTime, setDayEndTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -25,6 +27,8 @@ export default function CreateCamp() {
       name,
       start_date: startDate,
       end_date: endDate,
+      day_start_time: dayStartTime,
+      day_end_time: dayEndTime,
       groupe,
       unite,
       responsable,
@@ -45,6 +49,8 @@ export default function CreateCamp() {
       setName("");
       setStartDate("");
       setEndDate("");
+      setDayStartTime("");
+      setDayEndTime("");
       setGroupe("");
       setUnite("");
       setResponsable("");
@@ -100,6 +106,25 @@ export default function CreateCamp() {
             <div>
               <label
                 className="block text-sm font-medium mb-1"
+                htmlFor="dayStartTime"
+              >
+                Heure de début
+              </label>
+              <input
+                id="dayStartTime"
+                type="time"
+                className="w-full rounded-md border border-gray-300 p-2"
+                value={dayStartTime}
+                onChange={(e) => setDayStartTime(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                className="block text-sm font-medium mb-1"
                 htmlFor="endDate"
               >
                 Date de fin
@@ -110,6 +135,22 @@ export default function CreateCamp() {
                 className="w-full rounded-md border border-gray-300 p-2"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label
+                className="block text-sm font-medium mb-1"
+                htmlFor="dayEndTime"
+              >
+                Heure de fin
+              </label>
+              <input
+                id="dayEndTime"
+                type="time"
+                className="w-full rounded-md border border-gray-300 p-2"
+                value={dayEndTime}
+                onChange={(e) => setDayEndTime(e.target.value)}
                 required
               />
             </div>

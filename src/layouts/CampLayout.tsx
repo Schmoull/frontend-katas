@@ -1,20 +1,67 @@
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
+import MainLayout from "../layouts/MainLayout";
+import { supabase } from "../lib/supabaseClient";
 
 type CampLayoutProps = {
   children: ReactNode;
 };
 
+type Camp = {
+  id: number;
+  name: string;
+  start_date: string;
+  end_date: string;
+  groupe: string;
+  unite: string;
+  responsable: string;
+  location: string;
+  theme: string;
+  description: string;
+  objectifs?: string;
+  fil_rouge?: string;
+};
+
 export default function CampLayout({ children }: CampLayoutProps) {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const [loading, setLoading] = useState(true);
+  const [camp, setCamp] = useState<Camp | null>(null);
+
+  useEffect(() => {
+      (async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("camps")
+          .select("*")
+          .eq("id", Number(id))
+          .single(); // 👈 prend 1 ligne
+  
+        if (error || !data) {
+          console.error(error);
+          navigate("/home");
+          return;
+        }
+        setCamp(data);
+        setLoading(false);
+      })();
+    }, [id, navigate]);
+
+    if (loading || !camp) {
+        return (
+          <MainLayout>
+            <p>Chargement…</p>
+          </MainLayout>
+        );
+      }
 
   return (
     <div className="min-h-screen flex bg-gray-100 text-gray-900">
       {/* ----- Barre latérale du camp ----- */}
       <aside className="w-64 bg-white border-r shadow-sm p-6 flex flex-col justify-between">
         <div>
-          <h2 className="text-xl font-bold text-indigo-700 mb-4">Camp #{id}</h2>
+          <h2 className="text-xl font-bold text-indigo-700 mb-4">{camp.name}</h2>
 
           <nav className="space-y-2">
             <NavLink
