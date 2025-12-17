@@ -13,6 +13,7 @@ import CampPlanning from "./pages/CampPlanning";
 import CampActivites from "./pages/CampActivites";
 import CampSettings from "./pages/CampSettings";
 import Register from "./pages/Register";
+import JoinCamp from "./pages/JoinCamp";
 
 export default function App() {
   return (
@@ -111,6 +112,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <CampSettings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/join"
+        element={
+          <ProtectedRoute>
+            <JoinCamp />
           </ProtectedRoute>
         }
       />

@@ -33,6 +33,9 @@ export default function CampSettings() {
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [copyOk, setCopyOk] = useState(false);
+
   useEffect(() => {
     if (!campId || !user) return;
 
@@ -72,6 +75,19 @@ export default function CampSettings() {
 
       setMembers(memberData || []);
       setLoading(false);
+
+      // 3) Charger le code d'invitation
+      const { data: inviteData, error: inviteError } = await supabase
+        .from("camp_invites")
+        .select("code")
+        .eq("camp_id", campId)
+        .maybeSingle();
+
+      if (inviteError) {
+        console.error("Erreur chargement camp_invites :", inviteError);
+      } else {
+        setInviteCode(inviteData?.code ?? null);
+      }
     }
 
     fetchData();
@@ -152,6 +168,32 @@ export default function CampSettings() {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Membres du camp
           </h2>
+          <div className="mb-4 flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+            <div>
+              <p className="text-sm font-medium text-gray-900">Code d’invitation</p>
+              <p className="text-xs text-gray-600">
+                {inviteCode ? (
+                  <span className="font-mono">{inviteCode}</span>
+                ) : (
+                  "Aucun code disponible."
+                )}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              disabled={!inviteCode}
+              onClick={async () => {
+                if (!inviteCode) return;
+                await navigator.clipboard.writeText(inviteCode);
+                setCopyOk(true);
+                window.setTimeout(() => setCopyOk(false), 1200);
+              }}
+              className="px-3 py-1 rounded-md bg-indigo-600 text-white text-sm hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {copyOk ? "Copié ✅" : "Copier"}
+            </button>
+          </div>
 
           {members.length === 0 ? (
             <p className="text-gray-600 text-sm">

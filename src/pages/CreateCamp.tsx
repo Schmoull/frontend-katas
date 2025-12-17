@@ -4,6 +4,10 @@ import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../contexts/AuthContext";
 import type { FormEvent } from "react";
 
+function generateInviteCode() {
+  return "CAMP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
 export default function CreateCamp() {
   const { user } = useAuth();
   const [name, setName] = useState("");
@@ -17,6 +21,7 @@ export default function CreateCamp() {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const inviteCode = generateInviteCode();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,6 +51,7 @@ export default function CreateCamp() {
       objectifs: null,
       fil_rouge: null,
       owner_id: user.id, // id Supabase de l'utilisateur connecté
+      invite_code: inviteCode
     };
 
     // 2) Création du camp + récupération de son id
@@ -69,6 +75,10 @@ export default function CreateCamp() {
         user_id: user.id,
         role: "owner",
       },
+    ]);
+
+    await supabase.from("camp_invites").insert([
+      { camp_id: insertedCamp.id, code: inviteCode }
     ]);
 
     if (memberError) {
