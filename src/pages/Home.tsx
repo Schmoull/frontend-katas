@@ -15,6 +15,7 @@ type Camp = {
   location: string;
   theme: string;
   description: string;
+  owner_id?: string | null;
 };
 
 export default function Home() {

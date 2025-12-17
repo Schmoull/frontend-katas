@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import CampLayout from "../layouts/CampLayout";
 import { supabase } from "../lib/supabaseClient";
+import TimePicker15 from "../components/TimePicker15";
 
 type Activity = {
   id: number;
@@ -191,13 +192,10 @@ export default function CampActivites() {
               >
                 Début
               </label>
-              <input
+              <TimePicker15
                 id="startTime"
-                type="time"
-                className="w-full border border-gray-300 rounded-md p-2"
                 value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                required
+                onChange={setStartTime}
               />
             </div>
 
@@ -208,13 +206,10 @@ export default function CampActivites() {
               >
                 Fin
               </label>
-              <input
-                id="endTime"
-                type="time"
-                className="w-full border border-gray-300 rounded-md p-2"
+              <TimePicker15
+                id="startTime"
                 value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                required
+                onChange={setEndTime}
               />
             </div>
 

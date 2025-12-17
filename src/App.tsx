@@ -12,6 +12,7 @@ import CampFilRouge from "./pages/CampFilRouge";
 import CampPlanning from "./pages/CampPlanning";
 import CampActivites from "./pages/CampActivites";
 import CampSettings from "./pages/CampSettings";
+import Register from "./pages/Register";
 
 export default function App() {
   return (
@@ -21,6 +22,8 @@ export default function App() {
 
       {/* Route publique */}
       <Route path="/login" element={<Login />} />
+
+      <Route path="/register" element={<Register />} />
 
       {/* Routes protégées */}
       <Route

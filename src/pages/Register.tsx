@@ -1,11 +1,10 @@
-// src/pages/Login.tsx
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../contexts/AuthContext";
 import type { FormEvent } from "react";
 
-export default function Login() {
+export default function Register() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [email, setEmail] = useState("");
@@ -13,7 +12,6 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Si déjà connecté → redirection
   if (user) {
     navigate("/home");
   }
@@ -23,7 +21,7 @@ export default function Login() {
     setErrorMsg(null);
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
@@ -31,24 +29,27 @@ export default function Login() {
     setLoading(false);
 
     if (error) {
-      console.error("Erreur login Supabase :", error);
-      setErrorMsg(error.message || "Connexion impossible.");
+      console.error("Erreur register Supabase :", error);
+      setErrorMsg(error.message || "Inscription impossible.");
       return;
     }
 
-    if (!data.session) {
-      setErrorMsg("Aucune session créée. Vérifie ton email/mot de passe.");
+    if (!data.user) {
+      setErrorMsg(
+        "Inscription effectuée, mais utilisateur non disponible. Vérifie tes emails."
+      );
       return;
     }
 
-    navigate("/home");
+    // Option simple : rediriger vers le login après inscription
+    navigate("/login");
   }
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-gray-900">
-          Connexion
+          Créer un compte
         </h1>
 
         {errorMsg && (
@@ -79,7 +80,7 @@ export default function Login() {
               className="w-full border border-gray-300 rounded-md p-2"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
+              autoComplete="new-password"
               required
             />
           </div>
@@ -89,14 +90,14 @@ export default function Login() {
             disabled={loading}
             className="w-full py-2 rounded-md bg-indigo-600 text-white font-medium hover:bg-indigo-700 disabled:opacity-50"
           >
-            {loading ? "Connexion en cours..." : "Se connecter"}
+            {loading ? "Création en cours..." : "S'inscrire"}
           </button>
         </form>
 
         <p className="mt-4 text-sm text-gray-600">
-          Pas encore de compte ?{" "}
-          <Link to="/register" className="text-indigo-600 hover:underline">
-            Créer un compte
+          Déjà un compte ?{" "}
+          <Link to="/login" className="text-indigo-600 hover:underline">
+            Se connecter
           </Link>
         </p>
       </div>

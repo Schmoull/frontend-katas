@@ -1,21 +1,21 @@
+// src/routes/ProtectedRoute.tsx
 import { Navigate } from "react-router-dom";
-import React from "react";
+import { useAuth } from "../contexts/AuthContext";
 
-
-/**
- * Ce composant agit comme une "porte d'entrée" :
- * - il vérifie si un utilisateur est connecté (dans localStorage)
- * - s'il ne l'est pas, il redirige vers /login
- * - sinon, il affiche la page demandée
- */
-type ProtectedRouteProps = {
+type Props = {
   children: React.ReactNode;
 };
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const user = localStorage.getItem("user");
+export default function ProtectedRoute({ children }: Props) {
+  const { user, loading } = useAuth();
 
-  if (!user) return <Navigate to="/login" replace />;
-  
-  return <>{children}</>;
+  if (loading) {
+    return <p className="p-4 text-gray-600">Vérification de la session…</p>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
 }

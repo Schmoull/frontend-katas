@@ -17,6 +17,7 @@ type Camp = {
   description: string;
   objectifs?: string;
   fil_rouge?: string;
+  owner_id?: string | null;
 };
 
 export default function Camp() {

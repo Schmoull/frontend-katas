@@ -1,15 +1,15 @@
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import LogoutButton from "../components/LogoutButton";
+import { useAuth } from "../contexts/AuthContext";
 
 type MainLayoutProps = {
   children: ReactNode;
 };
 
 export default function MainLayout({ children }: MainLayoutProps) {
-  // 1️⃣ Récupérer l'utilisateur depuis le localStorage
-  const userData = localStorage.getItem("user");
-  const user = userData ? JSON.parse(userData) : null;
+
+  const { user } = useAuth();
 
   // 2️⃣ Extraire l'email (ou un fallback)
   const userEmail = user?.email ?? "Utilisateur inconnu";
@@ -29,7 +29,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <div className="mx-auto size-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xl font-bold">
               {initials}
             </div>
-            <p className="mt-2 font-semibold">{userEmail}</p>
+            <p className="mt-2 font-semibold">{user?.email}</p>
             <p className="text-sm text-gray-500">Responsable</p>
           </div>
 

@@ -1,8 +1,11 @@
 import { useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import { supabase } from "../lib/supabaseClient";
+import { useAuth } from "../contexts/AuthContext";
+import type { FormEvent } from "react";
 
 export default function CreateCamp() {
+  const { user } = useAuth();
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -12,52 +15,78 @@ export default function CreateCamp() {
   const [location, setLocation] = useState("");
   const [theme, setTheme] = useState("");
   const [description, setDescription] = useState("");
-  const [dayStartTime, setDayStartTime] = useState("");
-  const [dayEndTime, setDayEndTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!user) {
+      alert("Vous devez être connecté pour créer un camp.");
+      return;
+    }
+
     setLoading(true);
     setMessage("");
 
-    // ⚙️ Création de l’objet camp
+    // 1) Objet camp à insérer
     const newCamp = {
+      // 🧾 Champs existants
       name,
       start_date: startDate,
       end_date: endDate,
-      day_start_time: dayStartTime,
-      day_end_time: dayEndTime,
       groupe,
       unite,
       responsable,
       location,
       theme,
       description,
+
+      // 🆕 Champs demandés
+      objectifs: null,
+      fil_rouge: null,
+      owner_id: user.id, // id Supabase de l'utilisateur connecté
     };
 
-    // 📤 Envoi à Supabase
-    const { error } = await supabase.from("camps").insert([newCamp]);
+    // 2) Création du camp + récupération de son id
+    const { data: insertedCamp, error } = await supabase
+      .from("camps")
+      .insert([newCamp])
+      .select("id")
+      .single();
 
-    if (error) {
-      console.error("❌ Erreur Supabase :", error);
+    if (error || !insertedCamp) {
+      console.error("❌ Erreur Supabase (création camp) :", error);
       setMessage("Erreur : impossible de créer le camp.");
-    } else {
-      setMessage("✅ Camp créé avec succès !");
-      // Réinitialise le formulaire
-      setName("");
-      setStartDate("");
-      setEndDate("");
-      setDayStartTime("");
-      setDayEndTime("");
-      setGroupe("");
-      setUnite("");
-      setResponsable("");
-      setLocation("");
-      setTheme("");
-      setDescription("");
+      setLoading(false);
+      return;
     }
+
+    // 3) Ajout automatique du créateur comme membre 'owner'
+    const { error: memberError } = await supabase.from("camp_members").insert([
+      {
+        camp_id: insertedCamp.id,
+        user_id: user.id,
+        role: "owner",
+      },
+    ]);
+
+    if (memberError) {
+      console.error("⚠️ Erreur ajout membre owner :", memberError);
+      // on ne bloque pas, mais on log l'erreur
+    }
+
+    // 4) Reset du formulaire comme avant
+    setMessage("✅ Camp créé avec succès !");
+    setName("");
+    setStartDate("");
+    setEndDate("");
+    setGroupe("");
+    setUnite("");
+    setResponsable("");
+    setLocation("");
+    setTheme("");
+    setDescription("");
 
     setLoading(false);
   };
@@ -103,22 +132,6 @@ export default function CreateCamp() {
                 required
               />
             </div>
-            <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                htmlFor="dayStartTime"
-              >
-                Heure de début
-              </label>
-              <input
-                id="dayStartTime"
-                type="time"
-                className="w-full rounded-md border border-gray-300 p-2"
-                value={dayStartTime}
-                onChange={(e) => setDayStartTime(e.target.value)}
-                required
-              />
-            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -135,22 +148,6 @@ export default function CreateCamp() {
                 className="w-full rounded-md border border-gray-300 p-2"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label
-                className="block text-sm font-medium mb-1"
-                htmlFor="dayEndTime"
-              >
-                Heure de fin
-              </label>
-              <input
-                id="dayEndTime"
-                type="time"
-                className="w-full rounded-md border border-gray-300 p-2"
-                value={dayEndTime}
-                onChange={(e) => setDayEndTime(e.target.value)}
                 required
               />
             </div>

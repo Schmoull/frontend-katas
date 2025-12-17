@@ -7,6 +7,7 @@ type Camp = {
   id: number;
   name: string;
   fil_rouge?: string;
+  owner_id?: string | null;
 };
 
 export default function CampFilRouge() {
