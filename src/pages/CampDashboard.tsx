@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import CampLayout from "../layouts/CampLayout";
-import { supabase } from "../lib/supabaseClient";
+import { getCampDetails } from "../services/campServices";
 
 type Camp = {
   id: number;
@@ -21,38 +21,44 @@ function truncate(text: string, max: number) {
 }
 
 export default function CampDashboard() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [camp, setCamp] = useState<Camp | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [showFullDesc, setShowFullDesc] = useState(false);
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [camp, setCamp] = useState<Camp | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showFullDesc, setShowFullDesc] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("camps")
-        .select("*")
-        .eq("id", Number(id))
-        .single();
-
-      if (error || !data) {
-        console.error("Erreur Supabase (CampDashboard):", error);
-        navigate("/home");
-        return;
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      
+      let campData = null;
+      try {
+        // --- MODIFICATION ICI : Appel de la fonction de service RPC ---
+        campData = await getCampDetails(Number(id)); 
+      } catch (e) {
+        console.error("Erreur RPC lors du chargement du Dashboard :", e);
       }
-      setCamp(data);
-      setLoading(false);
-    })();
-  }, [id, navigate]);
 
-  if (loading || !camp) {
-    return (
-      <CampLayout>
-        <p>Chargement…</p>
-      </CampLayout>
-    );
-  }
+      if (!campData) {
+        console.error("Accès au camp non autorisé ou camp non trouvé.");
+        // Rediriger vers la page d'accueil en cas d'échec
+        navigate("/home"); 
+        return;
+      }
+      
+      setCamp(campData);
+      setLoading(false);
+    })();
+  }, [id, navigate]);
+
+  if (loading || !camp) {
+    // Reste inchangé
+    return (
+      <CampLayout>
+        <p>Chargement…</p>
+      </CampLayout>
+    );
+  }
 
   return (
     <CampLayout>

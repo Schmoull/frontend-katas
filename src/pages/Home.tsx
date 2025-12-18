@@ -16,6 +16,7 @@ type Camp = {
   theme: string;
   description: string;
   owner_id?: string | null;
+  invite_code: string;
 };
 
 export default function Home() {
@@ -29,23 +30,27 @@ export default function Home() {
       setLoading(true);
       setError(null);
 
-      const { data, error } = await supabase
-        .from("camps")
-        .select("*")
-        .order("id", { ascending: false });
+      // --- MODIFICATION ICI : Appel RPC ---
+      const { data, error } = await supabase
+        // La fonction get_user_camps retourne seulement les camps
+        // auxquels l'utilisateur est lié (owner ou membre).
+        .rpc("get_user_camps") 
+        .order("id", { ascending: false });
+      // ------------------------------------
 
-      if (error) {
-        console.error("❌ Erreur lors du chargement :", error);
-        setError("Impossible de charger les camps pour le moment.");
-      } else {
-        setCamps(data || []);
-      }
+      if (error) {
+        console.error("❌ Erreur RPC lors du chargement des camps :", error);
+        setError("Impossible de charger les camps pour le moment.");
+      } else {
+        // Le résultat du RPC est déjà l'ensemble de données voulu
+        setCamps(data || []);
+      }
 
-      setLoading(false);
-    }
+      setLoading(false);
+    }
 
-    fetchCamps();
-  }, []);
+    fetchCamps();
+  }, []);
 
   return (
     <MainLayout>

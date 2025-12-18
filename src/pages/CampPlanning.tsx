@@ -4,6 +4,7 @@ import CreateActivityModal from "../features/planning/CreateActivityModal";
 import { useParams } from "react-router-dom";
 import CampLayout from "../layouts/CampLayout";
 import { supabase } from "../lib/supabaseClient";
+import { getCampDetails, getCampActivities } from "../services/campServices";
 import type {
   Camp,
   Activity,
@@ -37,53 +38,38 @@ export default function CampPlanning() {
   // Drag vertical
   const [drag, setDrag] = useState<DragState | null>(null);
 
-  useEffect(() => {
-    if (!campId) return;
+useEffect(() => {
+    if (!campId) return;
 
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
+    async function fetchData() {
+      setLoading(true);
+      setError(null);
 
-      const [
-        { data: campData, error: campError },
-        { data: actData, error: actError },
-      ] = await Promise.all([
-        supabase
-          .from("camps")
-          .select("id, name, start_date, end_date")
-          .eq("id", campId)
-          .single(),
-        supabase
-          .from("activities")
-          .select(
-            "id, name, relation_activity, category, start_time, end_time, location, index_in_day"
-          )
-          .eq("camp_id", campId)
-          .order("start_time", { ascending: true }),
-      ]);
+      try {
+            // --- CORRECTION: UTILISER LES SERVICES RPC ---
+            const [campData, actData] = await Promise.all([
+              getCampDetails(campId), 
+              getCampActivities(campId),
+            ]);
+            // ---------------------------------------------
 
-      if (campError || !campData) {
-        console.error("Erreur chargement camp :", campError);
-        setError("Impossible de charger le camp.");
-        setLoading(false);
-        return;
-      }
+            if (!campData) throw new Error("Camp introuvable ou accès refusé.");
+            if (!actData) throw new Error("Activités introuvables ou accès refusé.");
 
-      if (actError) {
-        console.error("Erreur chargement activités :", actError);
-        setError("Impossible de charger les activités.");
-        setLoading(false);
-        return;
-      }
+            setCamp(campData);
+            setActivities(actData || []);
+            setPlanningConfig(buildPlanningConfig(actData || []));
 
-      setCamp(campData);
-      setActivities(actData || []);
-      setPlanningConfig(buildPlanningConfig(actData || []));
-      setLoading(false);
-    }
+      } catch (e: any) {
+          console.error("Erreur chargement planification :", e);
+          setError(e.message || "Impossible de charger le planning.");
+      }
 
-    fetchData();
-  }, [campId]);
+      setLoading(false);
+    }
+
+    fetchData();
+  }, [campId]);
 
   if (loading || !camp) {
     return (
@@ -178,20 +164,15 @@ export default function CampPlanning() {
   }
 
   async function reloadActivities() {
-    const { data: actData, error: actError } = await supabase
-      .from("activities")
-      .select(
-        "id, name, relation_activity, category, start_time, end_time, location, index_in_day"
-      )
-      .eq("camp_id", campId)
-      .order("start_time", { ascending: true });
-
-    if (actError) {
-      console.error("Erreur rechargement activités :", actError);
-      return;
-    }
-    setActivities(actData || []);
-    setPlanningConfig(buildPlanningConfig(actData || []));
+      setLoading(true); // Ajout d'un loading pour l'attente du rechargement
+      try {
+          const actData = await getCampActivities(campId);
+          setActivities(actData || []);
+          setPlanningConfig(buildPlanningConfig(actData || []));
+      } catch (e) {
+          console.error("Erreur rechargement activités (RPC):", e);
+      }
+      setLoading(false);
   }
 
   /**
@@ -285,35 +266,38 @@ export default function CampPlanning() {
 
     // 2) Recalcul automatique de index_in_day pour cette journée
     const nextDay = new Date(dayKey);
-    nextDay.setDate(nextDay.getDate() + 1);
-    const nextDayKey = nextDay.toISOString().slice(0, 10);
+    nextDay.setDate(nextDay.getDate() + 1);
 
-    const { data: dayActs, error: fetchDayErr } = await supabase
-      .from("activities")
-      .select("id, start_time")
-      .eq("camp_id", campId)
-      .gte("start_time", `${dayKey}T00:00:00`)
-      .lt("start_time", `${nextDayKey}T00:00:00`)
-      .order("start_time", { ascending: true });
+    // --- CORRECTION: UTILISER LA RPC POUR LA LECTURE DES ACTIVITÉS ---
+    let dayActs: Activity[] = [];
+    try {
+      const allActs = await getCampActivities(campId);
+      
+      // Le reste du bloc reste inchangé
+      dayActs = (allActs || [])
+          .filter(a => a.start_time.startsWith(dayKey))
+          .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
-    if (fetchDayErr) {
-      console.error(
-        "Erreur récupération activités pour reindex :",
-        fetchDayErr
-      );
-    } else if (dayActs) {
-      const updates = dayActs.map((a, idx) => ({
-        id: a.id,
-        index_in_day: idx + 1,
-      }));
+  } catch (fetchDayErr) {
+      console.error("Erreur récupération activités pour reindex (RPC) :", fetchDayErr);
+  }
+    // -----------------------------------------------------------------
 
-      const { error: reindexErr } = await supabase
-        .from("activities")
-        .upsert(updates);
-      if (reindexErr) {
-        console.error("Erreur reindex index_in_day :", reindexErr);
-      }
-    }
+    if (dayActs && dayActs.length > 0) { 
+      // ... (le reste du code d'indexation et upsert reste inchangé) ...
+      const updates = dayActs.map((a, idx) => ({
+        id: a.id,
+        index_in_day: idx + 1,
+      }));
+
+      // L'UPSERT fonctionne avec la Policy RLS UPDATE corrigée
+      const { error: reindexErr } = await supabase
+        .from("activities")
+        .upsert(updates);
+      if (reindexErr) {
+        console.error("Erreur reindex index_in_day :", reindexErr);
+      }
+    }
 
     // 3) Rechargement global
     await reloadActivities();

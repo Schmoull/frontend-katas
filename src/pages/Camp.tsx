@@ -2,7 +2,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import MainLayout from "../layouts/MainLayout";
-import { supabase } from "../lib/supabaseClient";
+import { getCampDetails } from '../services/campServices';
 
 type Camp = {
   id: number;
@@ -21,37 +21,43 @@ type Camp = {
 };
 
 export default function Camp() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [camp, setCamp] = useState<Camp | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [camp, setCamp] = useState<Camp | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("camps")
-        .select("*")
-        .eq("id", Number(id))
-        .single(); // 👈 prend 1 ligne
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
 
-      if (error || !data) {
-        console.error(error);
+      try {
+        // Utilisation du nouveau service
+        const campData = await getCampDetails(Number(id)); 
+
+        if (!campData) {
+          console.error("Camp non trouvé ou accès non autorisé.");
+          navigate("/home");
+          return;
+        }
+
+        setCamp(campData);
+      } catch (e) {
+        // Gérer les erreurs de la fonction RPC/Service
+        console.error(e);
         navigate("/home");
-        return;
       }
-      setCamp(data);
-      setLoading(false);
-    })();
-  }, [id, navigate]);
 
-  if (loading || !camp) {
-    return (
-      <MainLayout>
-        <p>Chargement…</p>
-      </MainLayout>
-    );
-  }
+      setLoading(false);
+    })();
+  }, [id, navigate]);
+
+  if (loading || !camp) {
+    return (
+      <MainLayout>
+        <p>Chargement…</p>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

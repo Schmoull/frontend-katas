@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import CampLayout from "../layouts/CampLayout";
 import { supabase } from "../lib/supabaseClient";
 import TimePicker15 from "../components/TimePicker15";
+import { getCampActivities } from "../services/campServices";
 
 type Activity = {
   id: number;
@@ -50,32 +51,29 @@ export default function CampActivites() {
   const [materials, setMaterials] = useState("");
   const [saving, setSaving] = useState(false);
 
-  // Chargement des activités du camp
-  useEffect(() => {
-    if (!campId) return;
+// Chargement des activités du camp
+  useEffect(() => {
+    if (!campId) return;
 
-    async function fetchActivities() {
-      setLoading(true);
-      setError(null);
+    async function fetchActivities() {
+      setLoading(true);
+      setError(null);
 
-      const { data, error } = await supabase
-        .from("activities")
-        .select("*")
-        .eq("camp_id", campId)
-        .order("start_time", { ascending: true });
-
-      if (error) {
-        console.error("Erreur chargement activités :", error);
-        setError("Impossible de charger les activités.");
-      } else {
-        setActivities(data || []);
+      // --- CORRECTION #1 (LECTURE INITIALE) ---
+      try {
+          const data = await getCampActivities(campId);
+          setActivities(data || []);
+      } catch (e) {
+          console.error("Erreur chargement activités :", e);
+          setError("Impossible de charger les activités.");
       }
+      // ----------------------------------------
 
-      setLoading(false);
-    }
+      setLoading(false);
+    }
 
-    fetchActivities();
-  }, [campId]);
+    fetchActivities();
+  }, [campId]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -114,13 +112,12 @@ export default function CampActivites() {
       alert("Erreur lors de la création de l’activité.");
     } else {
       // Rechargement de la liste
-      const { data } = await supabase
-        .from("activities")
-        .select("*")
-        .eq("camp_id", campId)
-        .order("start_time", { ascending: true });
-
-      setActivities(data || []);
+      try {
+          const data = await getCampActivities(campId);
+          setActivities(data || []);
+      } catch (e) {
+          console.error("Erreur rechargement activités :", e);
+      }      
 
       // Reset formulaire
       setName("");

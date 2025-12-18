@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import CampLayout from "../layouts/CampLayout";
 import { supabase } from "../lib/supabaseClient";
+import { getCampDetails } from '../services/campServices';
 
 type Camp = {
   id: number;
@@ -20,44 +21,59 @@ export default function CampObjectives() {
   const [message, setMessage] = useState<string | null>(null);
 
   // Charger le camp (id + name + objectifs)
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("camps")
-        .select("id,name,objectifs")
-        .eq("id", Number(id))
-        .single();
+useEffect(() => {
+    (async () => {
+      setLoading(true);
 
-      if (error || !data) {
-        console.error("Erreur Supabase (load objectifs):", error);
-        navigate("/home");
-        return;
+      let campData = null;
+      try {
+          // --- UTILISATION DU SERVICE RPC SÉCURISÉ ---
+          campData = await getCampDetails(Number(id)); 
+      } catch (e) {
+          console.error("Erreur RPC lors du chargement des Objectifs :", e);
       }
-      setCamp(data);
-      setObjectifs(data.objectifs ?? "");
-      setLoading(false);
-    })();
-  }, [id, navigate]);
+  
+      if (!campData) {
+        console.error("Accès au camp non autorisé ou camp non trouvé.");
+        navigate("/home");
+        return;
+      }
 
-  const handleSave = async () => {
-    if (!camp) return;
-    setSaving(true);
-    setMessage(null);
+      setCamp(campData); 
+      setObjectifs(campData.objectifs ?? ""); // Utilisation de la donnée chargée par RPC
+      setLoading(false);
+    })();
+  }, [id, navigate]);
 
-    const { error } = await supabase
-      .from("camps")
-      .update({ objectifs })
-      .eq("id", camp.id);
+const handleSave = async () => {
+    if (!camp) return;
+    setSaving(true);
+    setMessage(null);
 
-    if (error) {
-      console.error("Erreur Supabase (update objectifs):", error);
-      setMessage("❌ Échec de l’enregistrement.");
-    } else {
-      setMessage("✅ Objectifs enregistrés.");
-    }
-    setSaving(false);
-  };
+    let success = false;
+    try {
+        // --- REMPLACEMENT DE L'UPDATE DIRECT PAR L'APPEL RPC ---
+        const { data, error } = await supabase.rpc("update_camp_objectifs", {
+            p_camp_id: camp.id,
+            p_objectifs: objectifs, // Le nom du paramètre dans le RPC doit correspondre
+        });
+
+        if (error) {
+            throw error;
+        }
+        
+        success = data === true; 
+        
+    } catch (error) {
+      console.error("Erreur Supabase (update objectifs via RPC):", error);
+      setMessage("❌ Échec de l’enregistrement ou accès refusé.");
+    }
+
+    if (success) {
+      setMessage("✅ Objectifs enregistrés.");
+    }
+    setSaving(false);
+  };
 
   if (loading || !camp) {
     return (
