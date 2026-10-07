@@ -9,6 +9,7 @@ import ActivityForm from "./pages/ActivityForm";
 import MyActivities from "./pages/MyActivities";
 import Favorites from "./pages/Favorites";
 import AdminUsers from "./pages/AdminUsers";
+import ArchivedActivities from "./pages/ArchivedActivities";
 import AdminReferenceData from "./pages/AdminReferenceData";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -62,6 +63,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Favorites />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/archives"
+        element={
+          <ProtectedRoute minRole="moderateur">
+            <ArchivedActivities />
           </ProtectedRoute>
         }
       />

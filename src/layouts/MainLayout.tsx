@@ -72,6 +72,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
               </>
             )}
 
+            {hasRole("moderateur") && (
+              <NavLink to="/archives" className={navLinkClass}>
+                📦 Archives
+              </NavLink>
+            )}
+
             {hasRole("administrateur") && (
               <>
                 <NavLink to="/admin/utilisateurs" className={navLinkClass}>

@@ -6,6 +6,8 @@ import { LOCATION_LABELS, type Activity, type LocationType } from "../types";
 type ActivityCardProps = {
   activity: Activity;
   showStatus?: boolean;
+  // Pour les listes qui mélangent plusieurs auteurs (ex. archives)
+  showAuthor?: boolean;
 };
 
 function truncate(text: string, max: number) {
@@ -15,6 +17,7 @@ function truncate(text: string, max: number) {
 export default function ActivityCard({
   activity,
   showStatus = false,
+  showAuthor = false,
 }: ActivityCardProps) {
   const details = [
     formatDuration(activity.duration_minutes),
@@ -35,6 +38,12 @@ export default function ActivityCard({
         </div>
 
         <h3 className="mt-1 text-lg font-semibold">{activity.title}</h3>
+
+        {showAuthor && activity.author && (
+          <p className="text-xs text-gray-500">
+            Par {activity.author.display_name}
+          </p>
+        )}
 
         {details.length > 0 && (
           <p className="mt-1 text-sm text-gray-600">{details.join(" · ")}</p>

@@ -89,6 +89,19 @@ export async function listMyActivities(userId: string): Promise<Activity[]> {
   return data.map(sortRelations);
 }
 
+// Activités archivées de tous les auteurs. La RLS ne les rend visibles
+// qu'aux modérateurs et administrateurs (et à leur auteur).
+export async function listArchivedActivities(): Promise<Activity[]> {
+  const { data, error } = await supabase
+    .from("activities")
+    .select(ACTIVITY_SELECT)
+    .eq("status", "archived")
+    .order("updated_at", { ascending: false })
+    .overrideTypes<Activity[], { merge: false }>();
+  if (error) throw error;
+  return data.map(sortRelations);
+}
+
 // Renvoie null si l'activité n'existe pas ou n'est pas visible (RLS)
 export async function getActivity(id: string): Promise<Activity | null> {
   const { data, error } = await supabase
