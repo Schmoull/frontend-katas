@@ -5,9 +5,12 @@ a un type, des tranches d'âge, une durée, un nombre de participants, du matér
 des consignes de sécurité et un thème narratif.
 
 - Tout le monde peut consulter les activités publiées, même sans compte.
-- Toute personne ayant un compte peut créer des activités (brouillon → publiée → archivée).
-- Les modérateur·rice·s peuvent modifier, archiver ou supprimer n'importe quelle activité.
-- Les types d'activité et les tranches d'âge se gèrent directement dans Supabase.
+- Rôles hiérarchiques (chacun a les droits des rôles précédents) :
+  - **Visiteur** (rôle à l'inscription) : met des activités en favoris.
+  - **Contributeur** : crée des activités, tous les droits sur les siennes (brouillon → publiée → archivée).
+  - **Modérateur** : modifie et archive les activités des autres (hors brouillons).
+  - **Administrateur** : voit et supprime tout, change le rôle des utilisateurs.
+- Les types d'activité, tranches d'âge et formes caractéristiques J+S se gèrent directement dans Supabase.
 
 ## Structure
 

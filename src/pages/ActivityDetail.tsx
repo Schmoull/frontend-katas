@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import StatusBadge from "../components/StatusBadge";
+import FavoriteButton from "../components/FavoriteButton";
+import { activityPermissions } from "../lib/permissions";
 import { useAuth } from "../contexts/useAuth";
 import {
   deleteActivity,
@@ -38,7 +40,7 @@ const secondaryButton =
 export default function ActivityDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, isModerator } = useAuth();
+  const { user, profile } = useAuth();
 
   const [activity, setActivity] = useState<Activity | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,7 +88,8 @@ export default function ActivityDetail() {
     setBusy(true);
     try {
       await deleteActivity(activity.id);
-      navigate("/mes-activites");
+      // Un administrateur peut supprimer l'activité d'un autre
+      navigate(activity.created_by === user?.id ? "/mes-activites" : "/");
     } catch (e) {
       alert(errorMessage(e, "Impossible de supprimer l'activité."));
       setBusy(false);
@@ -115,7 +118,7 @@ export default function ActivityDetail() {
     );
   }
 
-  const canEdit = !!user && (activity.created_by === user.id || isModerator);
+  const can = activityPermissions(activity, user?.id, profile?.role);
 
   const facts = [
     { label: "Durée", value: formatDuration(activity.duration_minutes) },
@@ -158,41 +161,44 @@ export default function ActivityDetail() {
           </p>
         </header>
 
-        {canEdit && (
-          <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
+          {user && <FavoriteButton activityId={activity.id} />}
+          {can.canEdit && (
             <Link
               to={`/activites/${activity.id}/modifier`}
               className="px-3 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
             >
               Modifier
             </Link>
-            {activity.status !== "published" && (
-              <button
-                disabled={busy}
-                onClick={() => changeStatus("published")}
-                className={secondaryButton}
-              >
-                Publier
-              </button>
-            )}
-            {activity.status === "published" && (
-              <button
-                disabled={busy}
-                onClick={() => changeStatus("draft")}
-                className={secondaryButton}
-              >
-                Repasser en brouillon
-              </button>
-            )}
-            {activity.status !== "archived" && (
-              <button
-                disabled={busy}
-                onClick={() => changeStatus("archived")}
-                className={secondaryButton}
-              >
-                Archiver
-              </button>
-            )}
+          )}
+          {can.canPublish && (
+            <button
+              disabled={busy}
+              onClick={() => changeStatus("published")}
+              className={secondaryButton}
+            >
+              Publier
+            </button>
+          )}
+          {can.canUnpublish && (
+            <button
+              disabled={busy}
+              onClick={() => changeStatus("draft")}
+              className={secondaryButton}
+            >
+              Repasser en brouillon
+            </button>
+          )}
+          {can.canArchive && (
+            <button
+              disabled={busy}
+              onClick={() => changeStatus("archived")}
+              className={secondaryButton}
+            >
+              Archiver
+            </button>
+          )}
+          {can.canDelete && (
             <button
               disabled={busy}
               onClick={handleDelete}
@@ -200,8 +206,8 @@ export default function ActivityDetail() {
             >
               Supprimer
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {facts.length > 0 && (
           <dl className="grid gap-4 rounded-xl bg-white p-4 shadow-sm sm:grid-cols-2">

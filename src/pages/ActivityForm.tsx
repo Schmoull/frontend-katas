@@ -6,6 +6,7 @@ import { useAuth } from "../contexts/useAuth";
 import { useReferenceData } from "../hooks/useReferenceData";
 import { getActivity, saveActivity } from "../services/activitiesService";
 import { errorMessage, formatAgeBranch } from "../lib/format";
+import { activityPermissions } from "../lib/permissions";
 import {
   LOCATION_LABELS,
   LOCATION_TYPES,
@@ -121,7 +122,8 @@ export default function ActivityForm() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const navigate = useNavigate();
-  const { user, isModerator } = useAuth();
+  const { user, profile } = useAuth();
+  const role = profile?.role;
   const userId = user?.id;
   const {
     activityTypes,
@@ -146,7 +148,7 @@ export default function ActivityForm() {
         if (cancelled) return;
         if (!activity) {
           setLoadError("Activité introuvable.");
-        } else if (activity.created_by !== userId && !isModerator) {
+        } else if (!activityPermissions(activity, userId, role).canEdit) {
           setLoadError("Tu ne peux pas modifier cette activité.");
         } else {
           setValues(toFormValues(activity));
@@ -164,7 +166,7 @@ export default function ActivityForm() {
     return () => {
       cancelled = true;
     };
-  }, [id, userId, isModerator]);
+  }, [id, userId, role]);
 
   function set<K extends keyof FormValues>(key: K, value: FormValues[K]) {
     setValues((v) => ({ ...v, [key]: value }));

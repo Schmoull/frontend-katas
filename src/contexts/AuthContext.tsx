@@ -4,7 +4,8 @@ import { supabase } from "../lib/supabaseClient";
 import { getProfile } from "../services/profileService";
 import type { Session } from "@supabase/supabase-js";
 import type { ReactNode } from "react";
-import type { Profile } from "../types";
+import type { Profile, Role } from "../types";
+import { hasRole as roleAtLeast } from "../lib/permissions";
 import { AuthContext } from "./useAuth";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -80,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         session,
         profile,
-        isModerator: profile?.role === "moderateur",
+        hasRole: (min: Role) => roleAtLeast(profile?.role, min),
         loading,
         refreshProfile,
         signOut,

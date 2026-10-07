@@ -24,7 +24,7 @@ function getInitials(name: string) {
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
-  const { user, profile } = useAuth();
+  const { user, profile, hasRole } = useAuth();
 
   const displayName = profile?.display_name ?? user?.email ?? "";
   const roleLabel = profile ? ROLE_LABELS[profile.role as Role] : null;
@@ -56,6 +56,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
             </NavLink>
 
             {user && (
+              <NavLink to="/favoris" className={navLinkClass}>
+                ⭐ Mes favoris
+              </NavLink>
+            )}
+
+            {hasRole("contributeur") && (
               <>
                 <NavLink to="/mes-activites" className={navLinkClass}>
                   🗂️ Mes activités
@@ -63,10 +69,19 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 <NavLink to="/activites/nouvelle" className={navLinkClass}>
                   ➕ Nouvelle activité
                 </NavLink>
-                <NavLink to="/profil" className={navLinkClass}>
-                  ⚙️ Profil
-                </NavLink>
               </>
+            )}
+
+            {hasRole("administrateur") && (
+              <NavLink to="/admin/utilisateurs" className={navLinkClass}>
+                👥 Utilisateurs
+              </NavLink>
+            )}
+
+            {user && (
+              <NavLink to="/profil" className={navLinkClass}>
+                ⚙️ Profil
+              </NavLink>
             )}
           </nav>
         </div>

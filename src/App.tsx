@@ -7,6 +7,8 @@ import ResetPassword from "./pages/ResetPassword";
 import ActivityDetail from "./pages/ActivityDetail";
 import ActivityForm from "./pages/ActivityForm";
 import MyActivities from "./pages/MyActivities";
+import Favorites from "./pages/Favorites";
+import AdminUsers from "./pages/AdminUsers";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -27,11 +29,11 @@ export default function App() {
       {/* Atteinte via le lien de l'email, qui ouvre une session de récupération */}
       <Route path="/nouveau-mot-de-passe" element={<ResetPassword />} />
 
-      {/* Routes protégées */}
+      {/* Routes protégées (rôle minimum : voir lib/permissions.ts) */}
       <Route
         path="/activites/nouvelle"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute minRole="contributeur">
             <ActivityForm key="new" />
           </ProtectedRoute>
         }
@@ -39,7 +41,8 @@ export default function App() {
       <Route
         path="/activites/:id/modifier"
         element={
-          <ProtectedRoute>
+          // Le formulaire vérifie ensuite les droits sur cette activité
+          <ProtectedRoute minRole="contributeur">
             <EditActivity />
           </ProtectedRoute>
         }
@@ -48,8 +51,24 @@ export default function App() {
       <Route
         path="/mes-activites"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute minRole="contributeur">
             <MyActivities />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/favoris"
+        element={
+          <ProtectedRoute>
+            <Favorites />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/utilisateurs"
+        element={
+          <ProtectedRoute minRole="administrateur">
+            <AdminUsers />
           </ProtectedRoute>
         }
       />

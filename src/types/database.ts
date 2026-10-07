@@ -211,6 +211,39 @@ export type Database = {
         };
         Relationships: [];
       };
+      favorites: {
+        Row: {
+          activity_id: string;
+          created_at: string;
+          user_id: string;
+        };
+        Insert: {
+          activity_id: string;
+          created_at?: string;
+          user_id?: string;
+        };
+        Update: {
+          activity_id?: string;
+          created_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "favorites_activity_id_fkey";
+            columns: ["activity_id"];
+            isOneToOne: false;
+            referencedRelation: "activities";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "favorites_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profiles: {
         Row: {
           created_at: string;
@@ -237,7 +270,25 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      is_moderator: { Args: never; Returns: boolean };
+      can_edit_activity: {
+        Args: { p_created_by: string; p_status: string };
+        Returns: boolean;
+      };
+      has_role: { Args: { p_min_role: string }; Returns: boolean };
+      list_users: {
+        Args: never;
+        Returns: {
+          created_at: string;
+          display_name: string;
+          email: string;
+          id: string;
+          role: string;
+        }[];
+      };
+      set_user_role: {
+        Args: { p_role: string; p_user_id: string };
+        Returns: undefined;
+      };
       save_activity: {
         Args: {
           p_activity: Json;

@@ -8,12 +8,13 @@ export type AgeBranch = Tables<"age_branches">;
 export type CharacteristicForm = Tables<"characteristic_forms">;
 export type ActivityRow = Tables<"activities">;
 
-// Valeurs autorisées par les contraintes CHECK de la base
+// Valeurs autorisées par les contraintes CHECK de la base.
+// Rôles du plus faible au plus fort : chacun a les droits des précédents.
 export const ROLES = [
-  "animateur",
-  "responsable_unite",
+  "visiteur",
   "contributeur",
   "moderateur",
+  "administrateur",
 ] as const;
 export type Role = (typeof ROLES)[number];
 
@@ -24,10 +25,19 @@ export const LOCATION_TYPES = ["interieur", "exterieur", "les_deux"] as const;
 export type LocationType = (typeof LOCATION_TYPES)[number];
 
 export const ROLE_LABELS: Record<Role, string> = {
-  animateur: "Animateur·rice",
-  responsable_unite: "Responsable d'unité",
+  visiteur: "Visiteur·euse",
   contributeur: "Contributeur·rice",
   moderateur: "Modérateur·rice",
+  administrateur: "Administrateur·rice",
+};
+
+// Ligne renvoyée par la fonction list_users (page d'administration)
+export type UserAccount = {
+  id: string;
+  display_name: string;
+  email: string;
+  role: string;
+  created_at: string;
 };
 
 export const STATUS_LABELS: Record<ActivityStatus, string> = {

@@ -8,17 +8,18 @@ import type {
 } from "../types";
 
 // Activité + type + tranches d'âge + formes caractéristiques (via les tables
-// de liaison) + auteur
-const ACTIVITY_SELECT = `
+// de liaison) + auteur. La clé étrangère de l'auteur est nommée : favorites
+// relie aussi activities à profiles, PostgREST refuse sinon (PGRST201).
+export const ACTIVITY_SELECT = `
   *,
   activity_type:activity_types(id, name),
   age_branches(id, name, min_age, max_age),
   characteristic_forms(id, position, name),
-  author:profiles(id, display_name)
+  author:profiles!activities_created_by_fkey(id, display_name)
 `;
 
 // Ordre d'affichage des listes imbriquées (PostgREST ne garantit aucun ordre)
-function sortRelations(activity: Activity): Activity {
+export function sortRelations(activity: Activity): Activity {
   return {
     ...activity,
     age_branches: [...activity.age_branches].sort(
