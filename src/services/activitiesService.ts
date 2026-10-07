@@ -76,60 +76,20 @@ export async function getActivity(id: string): Promise<Activity | null> {
   return data;
 }
 
-// Colonnes de activities (les tranches d'âge vont dans la table de liaison)
-function toRow(input: ActivityInput): Omit<ActivityInput, "age_branch_ids"> {
-  const row: Partial<ActivityInput> = { ...input };
-  delete row.age_branch_ids;
-  return row as Omit<ActivityInput, "age_branch_ids">;
-}
-
-// Remplace les tranches d'âge liées à une activité
-async function setAgeBranches(activityId: string, ageBranchIds: string[]) {
-  const { error: deleteError } = await supabase
-    .from("activity_age_branches")
-    .delete()
-    .eq("activity_id", activityId);
-  if (deleteError) throw deleteError;
-
-  if (ageBranchIds.length === 0) return;
-
-  const { error: insertError } = await supabase
-    .from("activity_age_branches")
-    .insert(
-      ageBranchIds.map((age_branch_id) => ({
-        activity_id: activityId,
-        age_branch_id,
-      })),
-    );
-  if (insertError) throw insertError;
-}
-
-export async function createActivity(
+// Crée (id absent) ou modifie une activité avec ses tranches d'âge, en une
+// seule transaction côté base (fonction save_activity). Renvoie l'id.
+export async function saveActivity(
   input: ActivityInput,
-  userId: string,
+  id?: string,
 ): Promise<string> {
-  const { data, error } = await supabase
-    .from("activities")
-    .insert({ ...toRow(input), created_by: userId })
-    .select("id")
-    .single();
+  const { age_branch_ids, ...activity } = input;
+  const { data, error } = await supabase.rpc("save_activity", {
+    p_activity: activity,
+    p_age_branch_ids: age_branch_ids,
+    p_id: id,
+  });
   if (error) throw error;
-
-  await setAgeBranches(data.id, input.age_branch_ids);
-  return data.id;
-}
-
-export async function updateActivity(
-  id: string,
-  input: ActivityInput,
-): Promise<void> {
-  const { error } = await supabase
-    .from("activities")
-    .update(toRow(input))
-    .eq("id", id);
-  if (error) throw error;
-
-  await setAgeBranches(id, input.age_branch_ids);
+  return data;
 }
 
 export async function setActivityStatus(

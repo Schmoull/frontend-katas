@@ -4,11 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import { useAuth } from "../contexts/useAuth";
 import { useReferenceData } from "../hooks/useReferenceData";
-import {
-  createActivity,
-  getActivity,
-  updateActivity,
-} from "../services/activitiesService";
+import { getActivity, saveActivity } from "../services/activitiesService";
 import { errorMessage, formatAgeBranch } from "../lib/format";
 import {
   LOCATION_LABELS,
@@ -200,13 +196,7 @@ export default function ActivityForm() {
 
     setSaving(true);
     try {
-      let activityId: string;
-      if (id) {
-        await updateActivity(id, input);
-        activityId = id;
-      } else {
-        activityId = await createActivity(input, user.id);
-      }
+      const activityId = await saveActivity(input, id);
       navigate(`/activites/${activityId}`);
     } catch (e) {
       console.error("Erreur enregistrement activité :", e);

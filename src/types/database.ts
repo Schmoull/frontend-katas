@@ -190,6 +190,10 @@ export type Database = {
     };
     Functions: {
       is_moderator: { Args: never; Returns: boolean };
+      save_activity: {
+        Args: { p_activity: Json; p_age_branch_ids: string[]; p_id?: string };
+        Returns: string;
+      };
     };
     Enums: {
       [_ in never]: never;
