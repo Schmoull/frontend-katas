@@ -42,3 +42,12 @@ cp .env.example .env.local
 npm install
 npm run dev
 ```
+
+## Tests
+
+```bash
+npm test            # lance les tests une fois (Vitest)
+npm run test:watch  # relance les tests à chaque modification
+```
+
+Les tests sont à côté du code testé (`src/lib/*.test.ts`).
