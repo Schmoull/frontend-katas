@@ -38,11 +38,26 @@ export function formatDate(iso: string | null): string | null {
   });
 }
 
+// Contraintes CHECK de la base → message lisible
+const CONSTRAINT_MESSAGES: Record<string, string> = {
+  activities_participants_range_check:
+    "Le nombre minimum de participants dépasse le nombre maximum.",
+  activities_participants_positive_check:
+    "Le nombre de participants doit être d'au moins 1.",
+  activities_duration_positive_check:
+    "La durée doit être supérieure à 0 minute.",
+};
+
 // Les messages d'erreur Supabase ne sont pas des Error natives
 export function errorMessage(e: unknown, fallback: string): string {
   if (e && typeof e === "object" && "message" in e) {
     const message = (e as { message: unknown }).message;
-    if (typeof message === "string" && message) return message;
+    if (typeof message === "string" && message) {
+      const constraint = Object.keys(CONSTRAINT_MESSAGES).find((name) =>
+        message.includes(name),
+      );
+      return constraint ? CONSTRAINT_MESSAGES[constraint] : message;
+    }
   }
   return fallback;
 }
