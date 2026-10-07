@@ -47,19 +47,13 @@ export default function Login() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-gray-900">
-          Connexion
-        </h1>
+        <h1 className="text-2xl font-bold mb-6 text-gray-900">Connexion</h1>
 
-        {errorMsg && (
-          <p className="mb-4 text-sm text-red-600">{errorMsg}</p>
-        )}
+        {errorMsg && <p className="mb-4 text-sm text-red-600">{errorMsg}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Email
-            </label>
+            <label className="block text-sm font-medium mb-1">Email</label>
             <input
               type="email"
               className="w-full border border-gray-300 rounded-md p-2"

@@ -30,11 +30,11 @@ export default function CampDashboard() {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      
+
       let campData = null;
       try {
         // --- MODIFICATION ICI : Appel de la fonction de service RPC ---
-        campData = await getCampDetails(Number(id)); 
+        campData = await getCampDetails(Number(id));
       } catch (e) {
         console.error("Erreur RPC lors du chargement du Dashboard :", e);
       }
@@ -42,10 +42,10 @@ export default function CampDashboard() {
       if (!campData) {
         console.error("Accès au camp non autorisé ou camp non trouvé.");
         // Rediriger vers la page d'accueil en cas d'échec
-        navigate("/home"); 
+        navigate("/home");
         return;
       }
-      
+
       setCamp(campData);
       setLoading(false);
     })();
@@ -71,7 +71,9 @@ export default function CampDashboard() {
 
       <section className="grid gap-6 md:grid-cols-2">
         <div className="bg-white p-6 rounded-xl shadow-sm">
-          <h2 className="text-xl font-semibold mb-2 text-gray-900">Description</h2>
+          <h2 className="text-xl font-semibold mb-2 text-gray-900">
+            Description
+          </h2>
           <div className="text-gray-700 leading-relaxed">
             <p>{truncate(camp.description, 500)}</p>
             {camp.description.length > 500 && (
@@ -88,23 +90,36 @@ export default function CampDashboard() {
         <div className="bg-white p-6 rounded-xl shadow-sm">
           <h2 className="text-xl font-semibold mb-4 text-gray-900">Résumé</h2>
           <ul className="space-y-2 text-gray-700">
-            <li>🤦‍♂️ Responsable de camp : <strong>{camp.responsable}</strong></li>
-            <li>🎯 Objectifs : <strong>{camp.objectifs ? "renseignés" : "à compléter"}</strong></li>
-            <li>🧵 Fil rouge : <strong>{camp.fil_rouge ? "renseigné" : "à compléter"}</strong></li>
+            <li>
+              🤦‍♂️ Responsable de camp : <strong>{camp.responsable}</strong>
+            </li>
+            <li>
+              🎯 Objectifs :{" "}
+              <strong>{camp.objectifs ? "renseignés" : "à compléter"}</strong>
+            </li>
+            <li>
+              🧵 Fil rouge :{" "}
+              <strong>{camp.fil_rouge ? "renseigné" : "à compléter"}</strong>
+            </li>
           </ul>
         </div>
 
         {(!camp.objectifs || !camp.fil_rouge) && (
-        <div className="md:col-span-2 bg-indigo-50 p-6 rounded-xl border border-indigo-100">
-          <h2 className="text-lg font-semibold text-indigo-700 mb-2">Prochaine étape</h2>
-          <p className="text-gray-800">
-            Complète les <strong>objectifs</strong> et le <strong>fil rouge</strong> via le menu à gauche.
-          </p>
-        </div>
+          <div className="md:col-span-2 bg-indigo-50 p-6 rounded-xl border border-indigo-100">
+            <h2 className="text-lg font-semibold text-indigo-700 mb-2">
+              Prochaine étape
+            </h2>
+            <p className="text-gray-800">
+              Complète les <strong>objectifs</strong> et le{" "}
+              <strong>fil rouge</strong> via le menu à gauche.
+            </p>
+          </div>
         )}
 
         <div className="md:col-span-2 bg-indigo-50 p-6 rounded-xl border border-indigo-100">
-          <h2 className="text-lg font-semibold text-indigo-700 mb-2">Etape suivante</h2>
+          <h2 className="text-lg font-semibold text-indigo-700 mb-2">
+            Etape suivante
+          </h2>
           <p className="text-gray-800">
             Compléter le <strong>Picassos</strong> en remplissant vos activités.
           </p>
@@ -114,7 +129,9 @@ export default function CampDashboard() {
       {showFullDesc && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-lg w-[90%] shadow-lg relative">
-            <h3 className="text-xl font-semibold mb-4 text-gray-900">Description complète</h3>
+            <h3 className="text-xl font-semibold mb-4 text-gray-900">
+              Description complète
+            </h3>
             <p className="text-gray-700 whitespace-pre-line leading-relaxed">
               {camp.description}
             </p>
@@ -127,7 +144,6 @@ export default function CampDashboard() {
           </div>
         </div>
       )}
-
     </CampLayout>
   );
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import CampLayout from "../layouts/CampLayout";
 import { supabase } from "../lib/supabaseClient";
-import { getCampDetails } from '../services/campServices'; // Assurez-vous du chemin correct
+import { getCampDetails } from "../services/campServices"; // Assurez-vous du chemin correct
 
 type Camp = {
   id: number;
@@ -21,71 +21,70 @@ export default function CampFilRouge() {
   const [message, setMessage] = useState<string | null>(null);
 
   // Charger le camp (id + name + objectifs)
-    useEffect(() => {
-      (async () => {
-        setLoading(true);
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
 
-        let campData = null;
-        try {
-            // --- UTILISATION DU SERVICE RPC SÉCURISÉ ---
-            campData = await getCampDetails(Number(id)); 
-        } catch (e) {
-            console.error("Erreur RPC lors du chargement du Fil Rouge :", e);
-        }
-  
-        if (!campData) {
-          console.error("Accès au camp non autorisé ou camp non trouvé.");
-          navigate("/home");
-          return;
-        }
-
-        // Étant donné que campData est de type Camp (défini par le service), 
-        // vous pouvez l'utiliser directement :
-        setCamp(campData); 
-        setFilRouge(campData.fil_rouge ?? ""); // Utilisation de la donnée chargée par RPC
-        setLoading(false);
-      })();
-    }, [id, navigate]);
-  
-    const handleSave = async () => {
-      if (!camp) return;
-      setSaving(true);
-      setMessage(null);
-  
-      let success = false;
+      let campData = null;
       try {
-          // --- REMPLACEMENT DE L'UPDATE DIRECT PAR L'APPEL RPC ---
-          const { data, error } = await supabase.rpc("update_camp_fil_rouge", {
-              p_camp_id: camp.id,
-              p_fil_rouge: fil_rouge, // Le nom du paramètre dans le RPC doit correspondre
-          });
+        // --- UTILISATION DU SERVICE RPC SÉCURISÉ ---
+        campData = await getCampDetails(Number(id));
+      } catch (e) {
+        console.error("Erreur RPC lors du chargement du Fil Rouge :", e);
+      }
 
-          if (error) {
-              throw error; // Lancer l'erreur pour la capturer en dessous
-          }
-          
-          // La fonction RPC retourne true si la mise à jour a réussi
-          success = data === true; 
-          
-      } catch (error) {
-        console.error("Erreur Supabase (update fil rouge via RPC):", error);
-        setMessage("❌ Échec de l’enregistrement ou accès refusé.");
+      if (!campData) {
+        console.error("Accès au camp non autorisé ou camp non trouvé.");
+        navigate("/home");
+        return;
       }
-  
-      if (success) {
-        setMessage("✅ Fil rouge enregistré.");
+
+      // Étant donné que campData est de type Camp (défini par le service),
+      // vous pouvez l'utiliser directement :
+      setCamp(campData);
+      setFilRouge(campData.fil_rouge ?? ""); // Utilisation de la donnée chargée par RPC
+      setLoading(false);
+    })();
+  }, [id, navigate]);
+
+  const handleSave = async () => {
+    if (!camp) return;
+    setSaving(true);
+    setMessage(null);
+
+    let success = false;
+    try {
+      // --- REMPLACEMENT DE L'UPDATE DIRECT PAR L'APPEL RPC ---
+      const { data, error } = await supabase.rpc("update_camp_fil_rouge", {
+        p_camp_id: camp.id,
+        p_fil_rouge: fil_rouge, // Le nom du paramètre dans le RPC doit correspondre
+      });
+
+      if (error) {
+        throw error; // Lancer l'erreur pour la capturer en dessous
       }
-      
-      setSaving(false);
-    };
-  
-    if (loading || !camp) {
-      return (
-        <CampLayout>
-          <p>Chargement…</p>
-        </CampLayout>
-      );
+
+      // La fonction RPC retourne true si la mise à jour a réussi
+      success = data === true;
+    } catch (error) {
+      console.error("Erreur Supabase (update fil rouge via RPC):", error);
+      setMessage("❌ Échec de l’enregistrement ou accès refusé.");
     }
+
+    if (success) {
+      setMessage("✅ Fil rouge enregistré.");
+    }
+
+    setSaving(false);
+  };
+
+  if (loading || !camp) {
+    return (
+      <CampLayout>
+        <p>Chargement…</p>
+      </CampLayout>
+    );
+  }
 
   return (
     <CampLayout>

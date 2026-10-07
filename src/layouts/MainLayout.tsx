@@ -8,16 +8,15 @@ type MainLayoutProps = {
 };
 
 export default function MainLayout({ children }: MainLayoutProps) {
-
   const { user } = useAuth();
 
   // 2️⃣ Extraire l'email (ou un fallback)
   const userEmail = user?.email ?? "Utilisateur inconnu";
 
   // 3️⃣ Créer les initiales à partir de l'email
-  const initials = userEmail
-    .charAt(0)
-    .toUpperCase() + (userEmail.split("@")[0].charAt(1)?.toUpperCase() || "");
+  const initials =
+    userEmail.charAt(0).toUpperCase() +
+    (userEmail.split("@")[0].charAt(1)?.toUpperCase() || "");
 
   return (
     <div className="min-h-screen flex bg-gray-100 text-gray-900">

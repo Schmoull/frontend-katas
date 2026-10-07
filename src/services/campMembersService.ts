@@ -14,32 +14,32 @@ import { type CampMember } from "../types"; // Importe les nouveaux types
  * mais comme c'est complexe, on va juste récupérer l'ID et le rôle pour le moment.
  */
 export async function getCampMembers(campId: number): Promise<CampMember[]> {
-    // Appel de la fonction RPC (Remote Procedure Call)
-    const { data, error } = await supabase.rpc("get_camp_members_list", {
-        p_camp_id: campId,
-    });
+  // Appel de la fonction RPC (Remote Procedure Call)
+  const { data, error } = await supabase.rpc("get_camp_members_list", {
+    p_camp_id: campId,
+  });
 
-    if (error) {
-        // L'erreur ici inclura le message "Accès refusé" si l'utilisateur n'est pas membre
-        console.error("Erreur RPC:", error);
-        throw new Error(`Erreur de chargement des membres : ${error.message}`);
-    }
+  if (error) {
+    // L'erreur ici inclura le message "Accès refusé" si l'utilisateur n'est pas membre
+    console.error("Erreur RPC:", error);
+    throw new Error(`Erreur de chargement des membres : ${error.message}`);
+  }
 
-    // Mappage des données RPC pour correspondre à notre interface CampMember
-    const rows = data as Omit<CampMember, "user_profile">[];
-    const members: CampMember[] = rows.map(m => ({
-        id: m.id,
-        camp_id: m.camp_id,
-        user_id: m.user_id,
-        role: m.role as CampMember['role'],
-        created_at: m.created_at,
-        user_profile: {
-        email: m.user_id, // Placeholder (ID)
-        display_name: m.user_id, // Placeholder (ID)
-        },
-    }));
+  // Mappage des données RPC pour correspondre à notre interface CampMember
+  const rows = data as Omit<CampMember, "user_profile">[];
+  const members: CampMember[] = rows.map((m) => ({
+    id: m.id,
+    camp_id: m.camp_id,
+    user_id: m.user_id,
+    role: m.role as CampMember["role"],
+    created_at: m.created_at,
+    user_profile: {
+      email: m.user_id, // Placeholder (ID)
+      display_name: m.user_id, // Placeholder (ID)
+    },
+  }));
 
-    return members;
+  return members;
 }
 
 /**
@@ -47,7 +47,7 @@ export async function getCampMembers(campId: number): Promise<CampMember[]> {
  */
 export async function updateMemberRole(
   memberId: string,
-  newRole: 'owner' | 'admin' | 'member'
+  newRole: "owner" | "admin" | "member",
 ) {
   const { error } = await supabase
     .from("camp_members")

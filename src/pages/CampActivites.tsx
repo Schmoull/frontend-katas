@@ -10,7 +10,7 @@ type Activity = {
   name: string;
   category: string | null; // Type AC, SdC, AA
   relation_activity: string | null; // à son corps, à soi, etc...
-  start_time: string;  // timestamp renvoyé par Supabase
+  start_time: string; // timestamp renvoyé par Supabase
   end_time: string;
   responsable: string | null;
   location: string | null;
@@ -51,7 +51,7 @@ export default function CampActivites() {
   const [materials, setMaterials] = useState("");
   const [saving, setSaving] = useState(false);
 
-// Chargement des activités du camp
+  // Chargement des activités du camp
   useEffect(() => {
     if (!campId) return;
 
@@ -61,11 +61,11 @@ export default function CampActivites() {
 
       // --- CORRECTION #1 (LECTURE INITIALE) ---
       try {
-          const data = await getCampActivities(campId);
-          setActivities(data || []);
+        const data = await getCampActivities(campId);
+        setActivities(data || []);
       } catch (e) {
-          console.error("Erreur chargement activités :", e);
-          setError("Impossible de charger les activités.");
+        console.error("Erreur chargement activités :", e);
+        setError("Impossible de charger les activités.");
       }
       // ----------------------------------------
 
@@ -113,11 +113,11 @@ export default function CampActivites() {
     } else {
       // Rechargement de la liste
       try {
-          const data = await getCampActivities(campId);
-          setActivities(data || []);
+        const data = await getCampActivities(campId);
+        setActivities(data || []);
       } catch (e) {
-          console.error("Erreur rechargement activités :", e);
-      }      
+        console.error("Erreur rechargement activités :", e);
+      }
 
       // Reset formulaire
       setName("");
@@ -224,9 +224,7 @@ export default function CampActivites() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Relation
-              </label>
+              <label className="block text-sm font-medium mb-1">Relation</label>
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded-md p-2"
@@ -249,9 +247,7 @@ export default function CampActivites() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Lieu
-              </label>
+              <label className="block text-sm font-medium mb-1">Lieu</label>
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded-md p-2"
@@ -272,9 +268,7 @@ export default function CampActivites() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium mb-1">
-                Matériel
-              </label>
+              <label className="block text-sm font-medium mb-1">Matériel</label>
               <textarea
                 className="w-full border border-gray-300 rounded-md p-2 min-h-[60px]"
                 value={materials}
@@ -317,7 +311,10 @@ export default function CampActivites() {
               </thead>
               <tbody className="text-sm">
                 {activities.map((activity) => (
-                  <tr key={activity.id} className="odd:bg-white even:bg-gray-50">
+                  <tr
+                    key={activity.id}
+                    className="odd:bg-white even:bg-gray-50"
+                  >
                     <td className="px-4 py-2">
                       {formatDateTime(activity.start_time)}
                     </td>

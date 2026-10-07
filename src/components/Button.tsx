@@ -1,13 +1,18 @@
 import React from "react";
 
 type ButtonProps = {
-  children: React.ReactNode;   // contenu du bouton (texte ou icône)
-  onClick?: () => void;        // fonction exécutée au clic
-  disabled?: boolean;          // état désactivé
+  children: React.ReactNode; // contenu du bouton (texte ou icône)
+  onClick?: () => void; // fonction exécutée au clic
+  disabled?: boolean; // état désactivé
   loading?: boolean;
 };
 
-export default function Button({ children, onClick, disabled, loading }: ButtonProps) {
+export default function Button({
+  children,
+  onClick,
+  disabled,
+  loading,
+}: ButtonProps) {
   const isDisabled = disabled || loading;
 
   return (
@@ -16,11 +21,13 @@ export default function Button({ children, onClick, disabled, loading }: ButtonP
       disabled={disabled}
       aria-busy={loading}
       className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition
-                  ${isDisabled
-                    ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-                    : "bg-indigo-600 text-white hover:bg-indigo-700"}`}
+                  ${
+                    isDisabled
+                      ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                      : "bg-indigo-600 text-white hover:bg-indigo-700"
+                  }`}
     >
-    {loading && (
+      {loading && (
         <svg
           className="animate-spin h-4 w-4 text-white"
           xmlns="http://www.w3.org/2000/svg"

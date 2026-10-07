@@ -24,8 +24,9 @@ export default function CampPlanning() {
 
   const [camp, setCamp] = useState<Camp | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [planningConfig, setPlanningConfig] =
-    useState<PlanningConfig | null>(null);
+  const [planningConfig, setPlanningConfig] = useState<PlanningConfig | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,7 +39,7 @@ export default function CampPlanning() {
   // Drag vertical
   const [drag, setDrag] = useState<DragState | null>(null);
 
-useEffect(() => {
+  useEffect(() => {
     if (!campId) return;
 
     async function fetchData() {
@@ -46,23 +47,27 @@ useEffect(() => {
       setError(null);
 
       try {
-            // --- CORRECTION: UTILISER LES SERVICES RPC ---
-            const [campData, actData] = await Promise.all([
-              getCampDetails(campId), 
-              getCampActivities(campId),
-            ]);
-            // ---------------------------------------------
+        // --- CORRECTION: UTILISER LES SERVICES RPC ---
+        const [campData, actData] = await Promise.all([
+          getCampDetails(campId),
+          getCampActivities(campId),
+        ]);
+        // ---------------------------------------------
 
-            if (!campData) throw new Error("Camp introuvable ou accès refusé.");
-            if (!actData) throw new Error("Activités introuvables ou accès refusé.");
+        if (!campData) throw new Error("Camp introuvable ou accès refusé.");
+        if (!actData)
+          throw new Error("Activités introuvables ou accès refusé.");
 
-            setCamp(campData);
-            setActivities(actData || []);
-            setPlanningConfig(buildPlanningConfig(actData || []));
-
+        setCamp(campData);
+        setActivities(actData || []);
+        setPlanningConfig(buildPlanningConfig(actData || []));
       } catch (e) {
-          console.error("Erreur chargement planification :", e);
-          setError(e instanceof Error && e.message ? e.message : "Impossible de charger le planning.");
+        console.error("Erreur chargement planification :", e);
+        setError(
+          e instanceof Error && e.message
+            ? e.message
+            : "Impossible de charger le planning.",
+        );
       }
 
       setLoading(false);
@@ -164,15 +169,15 @@ useEffect(() => {
   }
 
   async function reloadActivities() {
-      setLoading(true); // Ajout d'un loading pour l'attente du rechargement
-      try {
-          const actData = await getCampActivities(campId);
-          setActivities(actData || []);
-          setPlanningConfig(buildPlanningConfig(actData || []));
-      } catch (e) {
-          console.error("Erreur rechargement activités (RPC):", e);
-      }
-      setLoading(false);
+    setLoading(true); // Ajout d'un loading pour l'attente du rechargement
+    try {
+      const actData = await getCampActivities(campId);
+      setActivities(actData || []);
+      setPlanningConfig(buildPlanningConfig(actData || []));
+    } catch (e) {
+      console.error("Erreur rechargement activités (RPC):", e);
+    }
+    setLoading(false);
   }
 
   /**
@@ -183,7 +188,7 @@ useEffect(() => {
     dayKey: string,
     relStartMinutes: number,
     durationMinutes: number,
-    e: MouseEvent<HTMLDivElement>
+    e: MouseEvent<HTMLDivElement>,
   ) {
     e.preventDefault();
     e.stopPropagation();
@@ -202,7 +207,7 @@ useEffect(() => {
    */
   async function handleDayMouseUp(
     dayKey: string,
-    e: MouseEvent<HTMLDivElement>
+    e: MouseEvent<HTMLDivElement>,
   ) {
     if (!drag) return;
     if (drag.dayKey !== dayKey) {
@@ -272,18 +277,23 @@ useEffect(() => {
     let dayActs: Activity[] = [];
     try {
       const allActs = await getCampActivities(campId);
-      
+
       // Le reste du bloc reste inchangé
       dayActs = (allActs || [])
-          .filter(a => a.start_time.startsWith(dayKey))
-          .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
-
-  } catch (fetchDayErr) {
-      console.error("Erreur récupération activités pour reindex (RPC) :", fetchDayErr);
-  }
+        .filter((a) => a.start_time.startsWith(dayKey))
+        .sort(
+          (a, b) =>
+            new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
+        );
+    } catch (fetchDayErr) {
+      console.error(
+        "Erreur récupération activités pour reindex (RPC) :",
+        fetchDayErr,
+      );
+    }
     // -----------------------------------------------------------------
 
-    if (dayActs && dayActs.length > 0) { 
+    if (dayActs && dayActs.length > 0) {
       // ... (le reste du code d'indexation et upsert reste inchangé) ...
       const updates = dayActs.map((a, idx) => ({
         id: a.id,
@@ -311,8 +321,8 @@ useEffect(() => {
         <header className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Picasso</h1>
           <p className="text-gray-600">
-            Vue planning des activités pour le camp{" "}
-            <strong>{camp.name}</strong>.
+            Vue planning des activités pour le camp <strong>{camp.name}</strong>
+            .
           </p>
           <p className="text-sm text-gray-500 mt-1">
             Double-clique sur un créneau vide pour créer une activité.
@@ -359,8 +369,7 @@ useEffect(() => {
                       key={hour}
                       className="border-t px-2 text-sm text-gray-600 flex items-start"
                       style={{
-                        height:
-                          (60 / config.slotMinutes) * config.slotHeight,
+                        height: (60 / config.slotMinutes) * config.slotHeight,
                       }} // 1h = 4 slots si 15 min
                     >
                       {hour.toString().padStart(2, "0")}h
@@ -370,7 +379,9 @@ useEffect(() => {
 
                 {/* Colonnes des jours */}
                 {days.map((day) => {
-                  const dayActivities = (activitiesByDay[day.key] || []).slice();
+                  const dayActivities = (
+                    activitiesByDay[day.key] || []
+                  ).slice();
 
                   return (
                     <div
@@ -398,20 +409,14 @@ useEffect(() => {
 
                       {/* Activités positionnées */}
                       {dayActivities.map((activity) => {
-                        const {
-                          startMinutes,
-                          durationMinutes,
-                          top,
-                          height,
-                        } = computeActivityPlacement(
-                          activity.start_time,
-                          activity.end_time,
-                          config
-                        );
+                        const { startMinutes, durationMinutes, top, height } =
+                          computeActivityPlacement(
+                            activity.start_time,
+                            activity.end_time,
+                            config,
+                          );
 
-                        const bg = colorForRelation(
-                          activity.relation_activity
-                        );
+                        const bg = colorForRelation(activity.relation_activity);
 
                         return (
                           <div
@@ -419,18 +424,14 @@ useEffect(() => {
                             className="absolute left-1 right-1 rounded-md px-2 py-1 text-xs text-white overflow-hidden cursor-pointer shadow-sm"
                             style={{ top, height, backgroundColor: bg }}
                             title={`${activity.name}
-${activity.location ?? ""}${
-                              activity.category
-                                ? "\n" + activity.category
-                                : ""
-                            }`}
+${activity.location ?? ""}${activity.category ? "\n" + activity.category : ""}`}
                             onMouseDown={(e) =>
                               handleActivityMouseDown(
                                 activity,
                                 day.key,
                                 startMinutes,
                                 durationMinutes,
-                                e
+                                e,
                               )
                             }
                           >

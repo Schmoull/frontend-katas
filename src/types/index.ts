@@ -21,7 +21,7 @@ export interface CampMember {
   id: string; // ID de la ligne dans camp_members
   camp_id: number;
   user_id: string; // ID de l'utilisateur
-  role: 'owner' | 'admin' | 'member'; // Utilisation des rôles définis ou futurs
+  role: "owner" | "admin" | "member"; // Utilisation des rôles définis ou futurs
   created_at: string;
   // Nous allons ajouter un champ pour le profil de l'utilisateur, même s'il est vide pour l'instant
   user_profile: {

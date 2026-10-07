@@ -10,7 +10,7 @@ type Camp = {
   start_date: string;
   end_date: string;
   groupe: string;
-  unite:  string;
+  unite: string;
   responsable: string;
   location: string;
   theme: string;
@@ -34,7 +34,7 @@ export default function Home() {
       const { data, error } = await supabase
         // La fonction get_user_camps retourne seulement les camps
         // auxquels l'utilisateur est lié (owner ou membre).
-        .rpc("get_user_camps") 
+        .rpc("get_user_camps")
         .order("id", { ascending: false });
       // ------------------------------------
 

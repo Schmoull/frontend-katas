@@ -110,9 +110,7 @@ export default function CreateActivityModal({
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Date
-              </label>
+              <label className="block text-sm font-medium mb-1">Date</label>
               <input
                 type="date"
                 className="w-full border border-gray-300 rounded-md p-2"
@@ -122,9 +120,7 @@ export default function CreateActivityModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Début
-              </label>
+              <label className="block text-sm font-medium mb-1">Début</label>
               <TimePicker15
                 id="startTime"
                 value={startTime}
@@ -132,9 +128,7 @@ export default function CreateActivityModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Fin
-              </label>
+              <label className="block text-sm font-medium mb-1">Fin</label>
               <TimePicker15
                 id="startTime"
                 value={endTime}
@@ -182,9 +176,7 @@ export default function CreateActivityModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Lieu
-              </label>
+              <label className="block text-sm font-medium mb-1">Lieu</label>
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded-md p-2"
@@ -206,9 +198,7 @@ export default function CreateActivityModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Matériel
-            </label>
+            <label className="block text-sm font-medium mb-1">Matériel</label>
             <textarea
               className="w-full border border-gray-300 rounded-md p-2 min-h-[60px]"
               value={materials}

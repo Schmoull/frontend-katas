@@ -2,7 +2,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import MainLayout from "../layouts/MainLayout";
-import { getCampDetails } from '../services/campServices';
+import { getCampDetails } from "../services/campServices";
 
 type Camp = {
   id: number;
@@ -32,7 +32,7 @@ export default function Camp() {
 
       try {
         // Utilisation du nouveau service
-        const campData = await getCampDetails(Number(id)); 
+        const campData = await getCampDetails(Number(id));
 
         if (!campData) {
           console.error("Camp non trouvé ou accès non autorisé.");
@@ -75,7 +75,8 @@ export default function Camp() {
         />
 
         <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-          {camp.theme}<br></br>
+          {camp.theme}
+          <br></br>
           {camp.description}
         </p>
 

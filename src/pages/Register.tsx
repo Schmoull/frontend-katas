@@ -36,7 +36,7 @@ export default function Register() {
 
     if (!data.user) {
       setErrorMsg(
-        "Inscription effectuée, mais utilisateur non disponible. Vérifie tes emails."
+        "Inscription effectuée, mais utilisateur non disponible. Vérifie tes emails.",
       );
       return;
     }
@@ -52,15 +52,11 @@ export default function Register() {
           Créer un compte
         </h1>
 
-        {errorMsg && (
-          <p className="mb-4 text-sm text-red-600">{errorMsg}</p>
-        )}
+        {errorMsg && <p className="mb-4 text-sm text-red-600">{errorMsg}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Email
-            </label>
+            <label className="block text-sm font-medium mb-1">Email</label>
             <input
               type="email"
               className="w-full border border-gray-300 rounded-md p-2"

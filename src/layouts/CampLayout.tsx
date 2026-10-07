@@ -30,42 +30,44 @@ export default function CampLayout({ children }: CampLayoutProps) {
   const [camp, setCamp] = useState<Camp | null>(null);
 
   useEffect(() => {
-      (async () => {
-        setLoading(true);
+    (async () => {
+      setLoading(true);
 
-        let campData = null;
-        try {
-            // --- CORRECTION : UTILISER LE SERVICE RPC ---
-            campData = await getCampDetails(Number(id)); 
-        } catch (e) {
-            console.error("Erreur RPC dans CampLayout:", e);
-        }
-
-        if (!campData) {
-          console.error("Accès au camp non autorisé via CampLayout.");
-          navigate("/home");
-          return;
-        }
-        
-        setCamp(campData);
-        setLoading(false);
-      })();
-    }, [id, navigate]);
-
-    if (loading || !camp) {
-        return (
-          <MainLayout>
-            <p>Chargement…</p>
-          </MainLayout>
-        );
+      let campData = null;
+      try {
+        // --- CORRECTION : UTILISER LE SERVICE RPC ---
+        campData = await getCampDetails(Number(id));
+      } catch (e) {
+        console.error("Erreur RPC dans CampLayout:", e);
       }
+
+      if (!campData) {
+        console.error("Accès au camp non autorisé via CampLayout.");
+        navigate("/home");
+        return;
+      }
+
+      setCamp(campData);
+      setLoading(false);
+    })();
+  }, [id, navigate]);
+
+  if (loading || !camp) {
+    return (
+      <MainLayout>
+        <p>Chargement…</p>
+      </MainLayout>
+    );
+  }
 
   return (
     <div className="min-h-screen flex bg-gray-100 text-gray-900">
       {/* ----- Barre latérale du camp ----- */}
       <aside className="w-64 bg-white border-r shadow-sm p-6 flex flex-col justify-between">
         <div>
-          <h2 className="text-xl font-bold text-indigo-700 mb-4">{camp.name}</h2>
+          <h2 className="text-xl font-bold text-indigo-700 mb-4">
+            {camp.name}
+          </h2>
 
           <nav className="space-y-2">
             <NavLink

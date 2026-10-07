@@ -5,7 +5,7 @@ const QUARTERS = ["00", "15", "30", "45"] as const;
 type QuarterMinute = (typeof QUARTERS)[number];
 
 type Props = {
-  value: string;            // format "HH:MM"
+  value: string; // format "HH:MM"
   onChange: (value: string) => void;
   label?: string;
   id?: string;
@@ -23,10 +23,9 @@ export default function TimePicker15({ value, onChange, label, id }: Props) {
   const hour = hourNum.toString().padStart(2, "0");
 
   // Normalisation des minutes : forcer sur un des quarts
-  let minute: QuarterMinute =
-    QUARTERS.includes(rawMinute as QuarterMinute)
-      ? (rawMinute as QuarterMinute)
-      : "00";
+  let minute: QuarterMinute = QUARTERS.includes(rawMinute as QuarterMinute)
+    ? (rawMinute as QuarterMinute)
+    : "00";
 
   function handleHourChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const newHour = e.target.value; // déjà "HH"

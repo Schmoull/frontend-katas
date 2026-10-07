@@ -51,7 +51,7 @@ export default function CreateCamp() {
       objectifs: null,
       fil_rouge: null,
       owner_id: user.id, // id Supabase de l'utilisateur connecté
-      invite_code: inviteCode
+      invite_code: inviteCode,
     };
 
     // 2) Création du camp + récupération de son id
@@ -77,9 +77,9 @@ export default function CreateCamp() {
       },
     ]);
 
-    await supabase.from("camp_invites").insert([
-      { camp_id: insertedCamp.id, code: inviteCode }
-    ]);
+    await supabase
+      .from("camp_invites")
+      .insert([{ camp_id: insertedCamp.id, code: inviteCode }]);
 
     if (memberError) {
       console.error("⚠️ Erreur ajout membre owner :", memberError);
@@ -195,7 +195,10 @@ export default function CreateCamp() {
 
           {/* Responsable */}
           <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="responsable">
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="responsable"
+            >
               Responsable
             </label>
             <input
@@ -210,7 +213,10 @@ export default function CreateCamp() {
 
           {/* Lieu */}
           <div>
-            <label className="block text-sm font-medium mb-1" htmlFor="location">
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="location"
+            >
               Lieu
             </label>
             <input
@@ -252,7 +258,7 @@ export default function CreateCamp() {
               value={description}
 
               onChange={(e) => {
-                if (e.target.value.length <= 2500){
+                if (e.target.value.length <= 2500) {
                   setDescription(e.target.value);
                 }
               }}

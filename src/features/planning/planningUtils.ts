@@ -4,17 +4,17 @@ import type { Day, Activity } from "./planningTypes";
 /**
  * Valeurs par défaut si aucune activité ne sort du cadre
  */
-const DEFAULT_DAY_START_HOUR = 8;  // 08h00
-const DEFAULT_DAY_END_HOUR = 22;   // 22h00
+const DEFAULT_DAY_START_HOUR = 8; // 08h00
+const DEFAULT_DAY_END_HOUR = 22; // 22h00
 
 export type PlanningConfig = {
-  startMinutes: number;   // minutes depuis minuit (début grille)
-  endMinutes: number;     // minutes depuis minuit (fin grille)
-  slotMinutes: number;    // durée d’un slot
-  slotHeight: number;     // hauteur d’un slot (px)
-  totalMinutes: number;   // end - start
-  totalSlots: number;     // totalMinutes / slotMinutes
-  hours: number[];        // heures à afficher dans la colonne de gauche
+  startMinutes: number; // minutes depuis minuit (début grille)
+  endMinutes: number; // minutes depuis minuit (fin grille)
+  slotMinutes: number; // durée d’un slot
+  slotHeight: number; // hauteur d’un slot (px)
+  totalMinutes: number; // end - start
+  totalSlots: number; // totalMinutes / slotMinutes
+  hours: number[]; // heures à afficher dans la colonne de gauche
 };
 
 /**
@@ -52,7 +52,10 @@ export function buildPlanningConfig(activities: Activity[]): PlanningConfig {
   const totalMinutes = endMinutes - startMinutes;
   const totalSlots = totalMinutes / slotMinutes;
 
-  const hours = Array.from({ length: endHour - startHour }, (_, i) => startHour + i);
+  const hours = Array.from(
+    { length: endHour - startHour },
+    (_, i) => startHour + i,
+  );
 
   return {
     startMinutes,
@@ -127,9 +130,9 @@ export function colorForRelation(relation: string | null): string {
 export function computeActivityPlacement(
   startIso: string,
   endIso: string,
-  config: PlanningConfig
+  config: PlanningConfig,
 ): {
-  startMinutes: number;      // minutes depuis le haut de la grille
+  startMinutes: number; // minutes depuis le haut de la grille
   durationMinutes: number;
   top: number;
   height: number;

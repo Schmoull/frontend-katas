@@ -29,9 +29,7 @@ export default function Card({
   actions,
 }: CardProps) {
   return (
-    <article
-      className="overflow-hidden rounded-xl border bg-white text-gray-900 shadow-sm transition hover:shadow-md"
-    >
+    <article className="overflow-hidden rounded-xl border bg-white text-gray-900 shadow-sm transition hover:shadow-md">
       {imageSrc && (
         <img
           src={imageSrc}
@@ -44,11 +42,7 @@ export default function Card({
       <div className="p-4">
         <h3 className="text-lg font-semibold">{title}</h3>
 
-        {infoDate && (
-          <p className="mt-1 text-sm text-gray-600">
-            {infoDate}
-          </p>
-        )}
+        {infoDate && <p className="mt-1 text-sm text-gray-600">{infoDate}</p>}
 
         {description && (
           <p className="mt-1 text-sm text-gray-600">
@@ -56,11 +50,7 @@ export default function Card({
           </p>
         )}
 
-        {actions && (
-          <div className="mt-4 flex gap-2">
-            {actions}
-          </div>
-        )}
+        {actions && <div className="mt-4 flex gap-2">{actions}</div>}
       </div>
     </article>
   );
