@@ -21,15 +21,15 @@ function truncate(text: string, max: number) {
 }
 
 export default function CampDashboard() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [camp, setCamp] = useState<Camp | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [showFullDesc, setShowFullDesc] = useState(false);
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [camp, setCamp] = useState<Camp | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showFullDesc, setShowFullDesc] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
       
       let campData = null;
       try {
@@ -39,26 +39,26 @@ export default function CampDashboard() {
         console.error("Erreur RPC lors du chargement du Dashboard :", e);
       }
 
-      if (!campData) {
-        console.error("Accès au camp non autorisé ou camp non trouvé.");
+      if (!campData) {
+        console.error("Accès au camp non autorisé ou camp non trouvé.");
         // Rediriger vers la page d'accueil en cas d'échec
-        navigate("/home"); 
-        return;
-      }
+        navigate("/home"); 
+        return;
+      }
       
-      setCamp(campData);
-      setLoading(false);
-    })();
-  }, [id, navigate]);
+      setCamp(campData);
+      setLoading(false);
+    })();
+  }, [id, navigate]);
 
-  if (loading || !camp) {
-    // Reste inchangé
-    return (
-      <CampLayout>
-        <p>Chargement…</p>
-      </CampLayout>
-    );
-  }
+  if (loading || !camp) {
+    // Reste inchangé
+    return (
+      <CampLayout>
+        <p>Chargement…</p>
+      </CampLayout>
+    );
+  }
 
   return (
     <CampLayout>

@@ -21,14 +21,14 @@ type Camp = {
 };
 
 export default function Camp() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [camp, setCamp] = useState<Camp | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [camp, setCamp] = useState<Camp | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
 
       try {
         // Utilisation du nouveau service
@@ -47,17 +47,17 @@ export default function Camp() {
         navigate("/home");
       }
 
-      setLoading(false);
-    })();
-  }, [id, navigate]);
+      setLoading(false);
+    })();
+  }, [id, navigate]);
 
-  if (loading || !camp) {
-    return (
-      <MainLayout>
-        <p>Chargement…</p>
-      </MainLayout>
-    );
-  }
+  if (loading || !camp) {
+    return (
+      <MainLayout>
+        <p>Chargement…</p>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

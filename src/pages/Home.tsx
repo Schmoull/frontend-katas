@@ -31,26 +31,26 @@ export default function Home() {
       setError(null);
 
       // --- MODIFICATION ICI : Appel RPC ---
-      const { data, error } = await supabase
+      const { data, error } = await supabase
         // La fonction get_user_camps retourne seulement les camps
         // auxquels l'utilisateur est lié (owner ou membre).
-        .rpc("get_user_camps") 
-        .order("id", { ascending: false });
+        .rpc("get_user_camps") 
+        .order("id", { ascending: false });
       // ------------------------------------
 
-      if (error) {
-        console.error("❌ Erreur RPC lors du chargement des camps :", error);
-        setError("Impossible de charger les camps pour le moment.");
-      } else {
+      if (error) {
+        console.error("❌ Erreur RPC lors du chargement des camps :", error);
+        setError("Impossible de charger les camps pour le moment.");
+      } else {
         // Le résultat du RPC est déjà l'ensemble de données voulu
-        setCamps(data || []);
-      }
+        setCamps(data || []);
+      }
 
-      setLoading(false);
-    }
+      setLoading(false);
+    }
 
-    fetchCamps();
-  }, []);
+    fetchCamps();
+  }, []);
 
   return (
     <MainLayout>

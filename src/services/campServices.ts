@@ -10,7 +10,7 @@ type Camp = {
     start_date: string;
     end_date: string;
     groupe: string;
-    unite:  string;
+    unite:  string;
     responsable: string;
     location: string;
     theme: string;

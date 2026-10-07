@@ -24,14 +24,14 @@ type Camp = {
 };
 
 export default function CampLayout({ children }: CampLayoutProps) {
-  const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const [loading, setLoading] = useState(true);
-  const [camp, setCamp] = useState<Camp | null>(null);
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const [loading, setLoading] = useState(true);
+  const [camp, setCamp] = useState<Camp | null>(null);
 
-  useEffect(() => {
-      (async () => {
-        setLoading(true);
+  useEffect(() => {
+      (async () => {
+        setLoading(true);
 
         let campData = null;
         try {
@@ -41,16 +41,16 @@ export default function CampLayout({ children }: CampLayoutProps) {
             console.error("Erreur RPC dans CampLayout:", e);
         }
 
-        if (!campData) {
-          console.error("Accès au camp non autorisé via CampLayout.");
-          navigate("/home");
-          return;
-        }
+        if (!campData) {
+          console.error("Accès au camp non autorisé via CampLayout.");
+          navigate("/home");
+          return;
+        }
         
-        setCamp(campData);
-        setLoading(false);
-      })();
-    }, [id, navigate]);
+        setCamp(campData);
+        setLoading(false);
+      })();
+    }, [id, navigate]);
 
     if (loading || !camp) {
         return (

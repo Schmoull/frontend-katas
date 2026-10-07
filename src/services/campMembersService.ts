@@ -26,7 +26,8 @@ export async function getCampMembers(campId: number): Promise<CampMember[]> {
     }
 
     // Mappage des données RPC pour correspondre à notre interface CampMember
-    const members: CampMember[] = (data as any[]).map(m => ({
+    const rows = data as Omit<CampMember, "user_profile">[];
+    const members: CampMember[] = rows.map(m => ({
         id: m.id,
         camp_id: m.camp_id,
         user_id: m.user_id,

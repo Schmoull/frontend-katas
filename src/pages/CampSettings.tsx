@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CampLayout from "../layouts/CampLayout";
 import { supabase } from "../lib/supabaseClient";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/useAuth";
 
 // Import des types et services
 // Import des types et services
@@ -60,9 +60,9 @@ export default function CampSettings() {
       } else {
         setInviteCode(inviteData?.code ?? null);
       }
-    } catch (e: any) {
+    } catch (e) {
       console.error(e);
-      setError(e.message || "Une erreur est survenue lors du chargement.");
+      setError(e instanceof Error && e.message ? e.message : "Une erreur est survenue lors du chargement.");
     } finally {
       setLoading(false);
     }

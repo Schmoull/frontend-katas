@@ -22,8 +22,8 @@ export default function CampFilRouge() {
 
   // Charger le camp (id + name + objectifs)
     useEffect(() => {
-      (async () => {
-        setLoading(true);
+      (async () => {
+        setLoading(true);
 
         let campData = null;
         try {
@@ -32,28 +32,28 @@ export default function CampFilRouge() {
         } catch (e) {
             console.error("Erreur RPC lors du chargement du Fil Rouge :", e);
         }
-  
-        if (!campData) {
-          console.error("Accès au camp non autorisé ou camp non trouvé.");
-          navigate("/home");
-          return;
-        }
+  
+        if (!campData) {
+          console.error("Accès au camp non autorisé ou camp non trouvé.");
+          navigate("/home");
+          return;
+        }
 
-        // Étant donné que campData est de type Camp (défini par le service), 
+        // Étant donné que campData est de type Camp (défini par le service), 
         // vous pouvez l'utiliser directement :
-        setCamp(campData); 
-        setFilRouge(campData.fil_rouge ?? ""); // Utilisation de la donnée chargée par RPC
-        setLoading(false);
-      })();
-    }, [id, navigate]);
+        setCamp(campData); 
+        setFilRouge(campData.fil_rouge ?? ""); // Utilisation de la donnée chargée par RPC
+        setLoading(false);
+      })();
+    }, [id, navigate]);
   
     const handleSave = async () => {
-      if (!camp) return;
-      setSaving(true);
-      setMessage(null);
-  
+      if (!camp) return;
+      setSaving(true);
+      setMessage(null);
+  
       let success = false;
-      try {
+      try {
           // --- REMPLACEMENT DE L'UPDATE DIRECT PAR L'APPEL RPC ---
           const { data, error } = await supabase.rpc("update_camp_fil_rouge", {
               p_camp_id: camp.id,
@@ -67,17 +67,17 @@ export default function CampFilRouge() {
           // La fonction RPC retourne true si la mise à jour a réussi
           success = data === true; 
           
-      } catch (error) {
-        console.error("Erreur Supabase (update fil rouge via RPC):", error);
-        setMessage("❌ Échec de l’enregistrement ou accès refusé.");
-      }
-  
+      } catch (error) {
+        console.error("Erreur Supabase (update fil rouge via RPC):", error);
+        setMessage("❌ Échec de l’enregistrement ou accès refusé.");
+      }
+  
       if (success) {
-        setMessage("✅ Fil rouge enregistré.");
-      }
+        setMessage("✅ Fil rouge enregistré.");
+      }
       
-      setSaving(false);
-    };
+      setSaving(false);
+    };
   
     if (loading || !camp) {
       return (

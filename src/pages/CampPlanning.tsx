@@ -39,37 +39,37 @@ export default function CampPlanning() {
   const [drag, setDrag] = useState<DragState | null>(null);
 
 useEffect(() => {
-    if (!campId) return;
+    if (!campId) return;
 
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
+    async function fetchData() {
+      setLoading(true);
+      setError(null);
 
-      try {
+      try {
             // --- CORRECTION: UTILISER LES SERVICES RPC ---
-            const [campData, actData] = await Promise.all([
-              getCampDetails(campId), 
-              getCampActivities(campId),
-            ]);
+            const [campData, actData] = await Promise.all([
+              getCampDetails(campId), 
+              getCampActivities(campId),
+            ]);
             // ---------------------------------------------
 
             if (!campData) throw new Error("Camp introuvable ou accès refusé.");
             if (!actData) throw new Error("Activités introuvables ou accès refusé.");
 
-            setCamp(campData);
-            setActivities(actData || []);
-            setPlanningConfig(buildPlanningConfig(actData || []));
+            setCamp(campData);
+            setActivities(actData || []);
+            setPlanningConfig(buildPlanningConfig(actData || []));
 
-      } catch (e: any) {
-          console.error("Erreur chargement planification :", e);
-          setError(e.message || "Impossible de charger le planning.");
-      }
+      } catch (e) {
+          console.error("Erreur chargement planification :", e);
+          setError(e instanceof Error && e.message ? e.message : "Impossible de charger le planning.");
+      }
 
-      setLoading(false);
-    }
+      setLoading(false);
+    }
 
-    fetchData();
-  }, [campId]);
+    fetchData();
+  }, [campId]);
 
   if (loading || !camp) {
     return (
@@ -266,7 +266,7 @@ useEffect(() => {
 
     // 2) Recalcul automatique de index_in_day pour cette journée
     const nextDay = new Date(dayKey);
-    nextDay.setDate(nextDay.getDate() + 1);
+    nextDay.setDate(nextDay.getDate() + 1);
 
     // --- CORRECTION: UTILISER LA RPC POUR LA LECTURE DES ACTIVITÉS ---
     let dayActs: Activity[] = [];
@@ -283,21 +283,21 @@ useEffect(() => {
   }
     // -----------------------------------------------------------------
 
-    if (dayActs && dayActs.length > 0) { 
-      // ... (le reste du code d'indexation et upsert reste inchangé) ...
-      const updates = dayActs.map((a, idx) => ({
-        id: a.id,
-        index_in_day: idx + 1,
-      }));
+    if (dayActs && dayActs.length > 0) { 
+      // ... (le reste du code d'indexation et upsert reste inchangé) ...
+      const updates = dayActs.map((a, idx) => ({
+        id: a.id,
+        index_in_day: idx + 1,
+      }));
 
-      // L'UPSERT fonctionne avec la Policy RLS UPDATE corrigée
-      const { error: reindexErr } = await supabase
-        .from("activities")
-        .upsert(updates);
-      if (reindexErr) {
-        console.error("Erreur reindex index_in_day :", reindexErr);
-      }
-    }
+      // L'UPSERT fonctionne avec la Policy RLS UPDATE corrigée
+      const { error: reindexErr } = await supabase
+        .from("activities")
+        .upsert(updates);
+      if (reindexErr) {
+        console.error("Erreur reindex index_in_day :", reindexErr);
+      }
+    }
 
     // 3) Rechargement global
     await reloadActivities();

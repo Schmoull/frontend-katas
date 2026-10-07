@@ -52,12 +52,12 @@ export default function CampActivites() {
   const [saving, setSaving] = useState(false);
 
 // Chargement des activités du camp
-  useEffect(() => {
-    if (!campId) return;
+  useEffect(() => {
+    if (!campId) return;
 
-    async function fetchActivities() {
-      setLoading(true);
-      setError(null);
+    async function fetchActivities() {
+      setLoading(true);
+      setError(null);
 
       // --- CORRECTION #1 (LECTURE INITIALE) ---
       try {
@@ -69,11 +69,11 @@ export default function CampActivites() {
       }
       // ----------------------------------------
 
-      setLoading(false);
-    }
+      setLoading(false);
+    }
 
-    fetchActivities();
-  }, [campId]);
+    fetchActivities();
+  }, [campId]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();

@@ -22,8 +22,8 @@ export default function CampObjectives() {
 
   // Charger le camp (id + name + objectifs)
 useEffect(() => {
-    (async () => {
-      setLoading(true);
+    (async () => {
+      setLoading(true);
 
       let campData = null;
       try {
@@ -32,26 +32,26 @@ useEffect(() => {
       } catch (e) {
           console.error("Erreur RPC lors du chargement des Objectifs :", e);
       }
-  
-      if (!campData) {
-        console.error("Accès au camp non autorisé ou camp non trouvé.");
-        navigate("/home");
-        return;
-      }
+  
+      if (!campData) {
+        console.error("Accès au camp non autorisé ou camp non trouvé.");
+        navigate("/home");
+        return;
+      }
 
-      setCamp(campData); 
-      setObjectifs(campData.objectifs ?? ""); // Utilisation de la donnée chargée par RPC
-      setLoading(false);
-    })();
-  }, [id, navigate]);
+      setCamp(campData); 
+      setObjectifs(campData.objectifs ?? ""); // Utilisation de la donnée chargée par RPC
+      setLoading(false);
+    })();
+  }, [id, navigate]);
 
 const handleSave = async () => {
-    if (!camp) return;
-    setSaving(true);
-    setMessage(null);
+    if (!camp) return;
+    setSaving(true);
+    setMessage(null);
 
     let success = false;
-    try {
+    try {
         // --- REMPLACEMENT DE L'UPDATE DIRECT PAR L'APPEL RPC ---
         const { data, error } = await supabase.rpc("update_camp_objectifs", {
             p_camp_id: camp.id,
@@ -64,16 +64,16 @@ const handleSave = async () => {
         
         success = data === true; 
         
-    } catch (error) {
-      console.error("Erreur Supabase (update objectifs via RPC):", error);
-      setMessage("❌ Échec de l’enregistrement ou accès refusé.");
-    }
+    } catch (error) {
+      console.error("Erreur Supabase (update objectifs via RPC):", error);
+      setMessage("❌ Échec de l’enregistrement ou accès refusé.");
+    }
 
     if (success) {
-      setMessage("✅ Objectifs enregistrés.");
-    }
-    setSaving(false);
-  };
+      setMessage("✅ Objectifs enregistrés.");
+    }
+    setSaving(false);
+  };
 
   if (loading || !camp) {
     return (
