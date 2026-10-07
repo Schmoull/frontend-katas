@@ -282,11 +282,17 @@ export default function ActivityForm() {
               required
             >
               <option value="">Choisir…</option>
-              {activityTypes.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.name}
-                </option>
-              ))}
+              {activityTypes
+                // « Inconnu » ne se choisit pas, sauf s'il est déjà attribué
+                .filter(
+                  (type) =>
+                    !type.is_fallback || type.id === values.activity_type_id,
+                )
+                .map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
             </select>
           </Field>
 

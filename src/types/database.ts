@@ -158,16 +158,19 @@ export type Database = {
         Row: {
           description: string | null;
           id: string;
+          is_fallback: boolean;
           name: string;
         };
         Insert: {
           description?: string | null;
           id?: string;
+          is_fallback?: boolean;
           name: string;
         };
         Update: {
           description?: string | null;
           id?: string;
+          is_fallback?: boolean;
           name?: string;
         };
         Relationships: [];
@@ -274,6 +277,7 @@ export type Database = {
         Args: { p_created_by: string; p_status: string };
         Returns: boolean;
       };
+      delete_activity_type: { Args: { p_id: string }; Returns: undefined };
       has_role: { Args: { p_min_role: string }; Returns: boolean };
       list_users: {
         Args: never;

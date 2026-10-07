@@ -10,7 +10,7 @@ des consignes de sécurité et un thème narratif.
   - **Contributeur** : crée des activités, tous les droits sur les siennes (brouillon → publiée → archivée).
   - **Modérateur** : modifie et archive les activités des autres (hors brouillons).
   - **Administrateur** : voit et supprime tout, change le rôle des utilisateurs.
-- Les types d'activité, tranches d'âge et formes caractéristiques J+S se gèrent directement dans Supabase.
+- Les administrateurs gèrent les types d'activité, tranches d'âge et formes caractéristiques J+S depuis la page « Données de référence ».
 
 ## Structure
 

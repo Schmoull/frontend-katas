@@ -38,7 +38,7 @@ export function formatDate(iso: string | null): string | null {
   });
 }
 
-// Contraintes CHECK de la base → message lisible
+// Contraintes de la base (CHECK, UNIQUE, clés étrangères) → message lisible
 const CONSTRAINT_MESSAGES: Record<string, string> = {
   activities_participants_range_check:
     "Le nombre minimum de participants dépasse le nombre maximum.",
@@ -46,6 +46,16 @@ const CONSTRAINT_MESSAGES: Record<string, string> = {
     "Le nombre de participants doit être d'au moins 1.",
   activities_duration_positive_check:
     "La durée doit être supérieure à 0 minute.",
+  age_branches_age_range_check:
+    "L'âge minimum doit être positif et ne pas dépasser l'âge maximum.",
+  characteristic_forms_position_check: "Le numéro doit être d'au moins 1.",
+  activity_types_name_key: "Un type porte déjà ce nom.",
+  age_branches_name_key: "Une tranche d'âge porte déjà ce nom.",
+  characteristic_forms_name_key: "Une forme caractéristique porte déjà ce nom.",
+  characteristic_forms_position_key:
+    "Une forme caractéristique porte déjà ce numéro.",
+  activity_characteristic_forms_characteristic_form_id_fkey:
+    "Cette forme est utilisée par des activités : impossible de la supprimer.",
 };
 
 // Les messages d'erreur Supabase ne sont pas des Error natives
