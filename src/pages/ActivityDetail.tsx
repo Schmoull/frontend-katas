@@ -214,6 +214,22 @@ export default function ActivityDetail() {
           </dl>
         )}
 
+        {activity.characteristic_forms.length > 0 && (
+          <div className="rounded-xl bg-white p-4 shadow-sm">
+            <h2 className="text-lg font-semibold text-gray-900">
+              Formes caractéristiques
+            </h2>
+            <ul className="mt-2 space-y-1 text-gray-700">
+              {activity.characteristic_forms.map((form) => (
+                <li key={form.id}>
+                  <span className="font-semibold">{form.position}.</span>{" "}
+                  {form.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <div className="space-y-6 rounded-xl bg-white p-6 shadow-sm">
           <Section title="Description" text={activity.description} />
           <Section

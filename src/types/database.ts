@@ -124,6 +124,36 @@ export type Database = {
           },
         ];
       };
+      activity_characteristic_forms: {
+        Row: {
+          activity_id: string;
+          characteristic_form_id: string;
+        };
+        Insert: {
+          activity_id: string;
+          characteristic_form_id: string;
+        };
+        Update: {
+          activity_id?: string;
+          characteristic_form_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "activity_characteristic_forms_activity_id_fkey";
+            columns: ["activity_id"];
+            isOneToOne: false;
+            referencedRelation: "activities";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "activity_characteristic_forms_characteristic_form_id_fkey";
+            columns: ["characteristic_form_id"];
+            isOneToOne: false;
+            referencedRelation: "characteristic_forms";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       activity_types: {
         Row: {
           description: string | null;
@@ -163,6 +193,24 @@ export type Database = {
         };
         Relationships: [];
       };
+      characteristic_forms: {
+        Row: {
+          id: string;
+          name: string;
+          position: number;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          position: number;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          position?: number;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           created_at: string;
@@ -191,7 +239,12 @@ export type Database = {
     Functions: {
       is_moderator: { Args: never; Returns: boolean };
       save_activity: {
-        Args: { p_activity: Json; p_age_branch_ids: string[]; p_id?: string };
+        Args: {
+          p_activity: Json;
+          p_age_branch_ids: string[];
+          p_characteristic_form_ids: string[];
+          p_id?: string;
+        };
         Returns: string;
       };
     };

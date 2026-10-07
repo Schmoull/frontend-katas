@@ -4,6 +4,8 @@ import type { Tables } from "./database";
 export type Profile = Tables<"profiles">;
 export type ActivityType = Tables<"activity_types">;
 export type AgeBranch = Tables<"age_branches">;
+// Formes caractéristiques J+S « Sport de camp/Trekking »
+export type CharacteristicForm = Tables<"characteristic_forms">;
 export type ActivityRow = Tables<"activities">;
 
 // Valeurs autorisées par les contraintes CHECK de la base
@@ -44,6 +46,7 @@ export const LOCATION_LABELS: Record<LocationType, string> = {
 export type Activity = ActivityRow & {
   activity_type: Pick<ActivityType, "id" | "name"> | null;
   age_branches: AgeBranch[];
+  characteristic_forms: CharacteristicForm[];
   author: Pick<Profile, "id" | "display_name"> | null;
 };
 
@@ -63,4 +66,5 @@ export type ActivityInput = {
   theme_adaptation_notes: string | null;
   status: ActivityStatus;
   age_branch_ids: string[];
+  characteristic_form_ids: string[];
 };

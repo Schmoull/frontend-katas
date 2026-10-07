@@ -30,7 +30,10 @@ type FormValues = {
   narrative_theme: string;
   theme_adaptation_notes: string;
   age_branch_ids: string[];
+  characteristic_form_ids: string[];
 };
+
+type IdListKey = "age_branch_ids" | "characteristic_form_ids";
 
 const EMPTY_VALUES: FormValues = {
   title: "",
@@ -46,6 +49,7 @@ const EMPTY_VALUES: FormValues = {
   narrative_theme: "",
   theme_adaptation_notes: "",
   age_branch_ids: [],
+  characteristic_form_ids: [],
 };
 
 function toFormValues(activity: Activity): FormValues {
@@ -64,6 +68,7 @@ function toFormValues(activity: Activity): FormValues {
     narrative_theme: str(activity.narrative_theme),
     theme_adaptation_notes: str(activity.theme_adaptation_notes),
     age_branch_ids: activity.age_branches.map((b) => b.id),
+    characteristic_form_ids: activity.characteristic_forms.map((f) => f.id),
   };
 }
 
@@ -85,6 +90,7 @@ function toInput(values: FormValues, status: ActivityStatus): ActivityInput {
     theme_adaptation_notes: text(values.theme_adaptation_notes),
     status,
     age_branch_ids: values.age_branch_ids,
+    characteristic_form_ids: values.characteristic_form_ids,
   };
 }
 
@@ -120,6 +126,7 @@ export default function ActivityForm() {
   const {
     activityTypes,
     ageBranches,
+    characteristicForms,
     loading: refLoading,
   } = useReferenceData();
 
@@ -163,12 +170,13 @@ export default function ActivityForm() {
     setValues((v) => ({ ...v, [key]: value }));
   }
 
-  function toggleAgeBranch(branchId: string) {
+  // Coche / décoche un id dans une liste (tranches d'âge, formes)
+  function toggleId(key: IdListKey, itemId: string) {
     setValues((v) => ({
       ...v,
-      age_branch_ids: v.age_branch_ids.includes(branchId)
-        ? v.age_branch_ids.filter((b) => b !== branchId)
-        : [...v.age_branch_ids, branchId],
+      [key]: v[key].includes(itemId)
+        ? v[key].filter((i) => i !== itemId)
+        : [...v[key], itemId],
     }));
   }
 
@@ -182,6 +190,11 @@ export default function ActivityForm() {
       .submitter as HTMLButtonElement | null;
     const status = (submitter?.value || currentStatus) as ActivityStatus;
     const input = toInput(values, status);
+
+    if (input.characteristic_form_ids.length === 0) {
+      setFormError("Choisis au moins une forme caractéristique.");
+      return;
+    }
 
     if (
       input.min_participants != null &&
@@ -275,6 +288,30 @@ export default function ActivityForm() {
             </select>
           </Field>
 
+          <fieldset className="md:col-span-2">
+            <legend className="block text-sm font-medium mb-1">
+              Formes caractéristiques * (J+S Sport de camp/Trekking)
+            </legend>
+            <div className="space-y-2">
+              {characteristicForms.map((form) => (
+                <label key={form.id} className="flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    className="mt-1"
+                    checked={values.characteristic_form_ids.includes(form.id)}
+                    onChange={() =>
+                      toggleId("characteristic_form_ids", form.id)
+                    }
+                  />
+                  <span>
+                    <span className="font-semibold">{form.position}.</span>{" "}
+                    {form.name}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
           <Field label="Lieu" htmlFor="location_type">
             <select
               id="location_type"
@@ -340,7 +377,7 @@ export default function ActivityForm() {
                     <input
                       type="checkbox"
                       checked={values.age_branch_ids.includes(branch.id)}
-                      onChange={() => toggleAgeBranch(branch.id)}
+                      onChange={() => toggleId("age_branch_ids", branch.id)}
                     />
                     {formatAgeBranch(branch)}
                   </label>

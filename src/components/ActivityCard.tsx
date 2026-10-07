@@ -46,8 +46,26 @@ export default function ActivityCard({
           </p>
         )}
 
+        {activity.characteristic_forms.length > 0 && (
+          // Intitulés trop longs pour la carte : numéro + intitulé au survol
+          <ul
+            className="mt-3 flex flex-wrap gap-1"
+            aria-label="Formes caractéristiques"
+          >
+            {activity.characteristic_forms.map((form) => (
+              <li
+                key={form.id}
+                title={form.name}
+                className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700"
+              >
+                FC {form.position}
+              </li>
+            ))}
+          </ul>
+        )}
+
         {activity.age_branches.length > 0 && (
-          <ul className="mt-3 flex flex-wrap gap-1">
+          <ul className="mt-2 flex flex-wrap gap-1">
             {activity.age_branches.map((branch) => (
               <li
                 key={branch.id}

@@ -13,11 +13,13 @@ import {
 const selectClass = "w-full border border-gray-300 rounded-md p-2 bg-white";
 
 export default function Catalog() {
-  const { activityTypes, ageBranches } = useReferenceData();
+  const { activityTypes, ageBranches, characteristicForms } =
+    useReferenceData();
 
   const [search, setSearch] = useState("");
   const [activityTypeId, setActivityTypeId] = useState("");
   const [ageBranchId, setAgeBranchId] = useState("");
+  const [characteristicFormId, setCharacteristicFormId] = useState("");
   const [locationType, setLocationType] = useState("");
 
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -36,6 +38,7 @@ export default function Catalog() {
           search: search.trim() || undefined,
           activityTypeId: activityTypeId || undefined,
           ageBranchId: ageBranchId || undefined,
+          characteristicFormId: characteristicFormId || undefined,
           locationType: (locationType as LocationType) || undefined,
         });
         if (!cancelled) setActivities(data);
@@ -51,7 +54,7 @@ export default function Catalog() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [search, activityTypeId, ageBranchId, locationType]);
+  }, [search, activityTypeId, ageBranchId, characteristicFormId, locationType]);
 
   return (
     <MainLayout>
@@ -113,6 +116,21 @@ export default function Catalog() {
             {LOCATION_TYPES.map((value) => (
               <option key={value} value={value}>
                 {LOCATION_LABELS[value]}
+              </option>
+            ))}
+          </select>
+
+          {/* Pleine largeur : les intitulés des formes sont longs */}
+          <select
+            aria-label="Forme caractéristique"
+            className={`${selectClass} sm:col-span-2 lg:col-span-4`}
+            value={characteristicFormId}
+            onChange={(e) => setCharacteristicFormId(e.target.value)}
+          >
+            <option value="">Toutes les formes caractéristiques</option>
+            {characteristicForms.map((form) => (
+              <option key={form.id} value={form.id}>
+                {form.position}. {form.name}
               </option>
             ))}
           </select>
