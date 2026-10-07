@@ -78,6 +78,12 @@ export default function Login() {
               autoComplete="current-password"
               required
             />
+            <Link
+              to="/mot-de-passe-oublie"
+              className="mt-1 inline-block text-sm text-indigo-600 hover:underline"
+            >
+              Mot de passe oublié ?
+            </Link>
           </div>
 
           <button

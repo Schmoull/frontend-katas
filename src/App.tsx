@@ -2,6 +2,8 @@ import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import Catalog from "./pages/Catalog";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import ActivityDetail from "./pages/ActivityDetail";
 import ActivityForm from "./pages/ActivityForm";
 import MyActivities from "./pages/MyActivities";
@@ -21,6 +23,9 @@ export default function App() {
       <Route path="/" element={<Catalog />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />
+      {/* Atteinte via le lien de l'email, qui ouvre une session de récupération */}
+      <Route path="/nouveau-mot-de-passe" element={<ResetPassword />} />
 
       {/* Routes protégées */}
       <Route
