@@ -1,8 +1,24 @@
-# Frontend Katas (Vite + React + Tailwind)
+# Catalogue d'activités (Vite + React + Tailwind + Supabase)
 
-Petit projet d’entraînement Frontend, basé sur Vite + React + TypeScript + Tailwind.
+Catalogue partagé d'activités pour animateurs et animatrices : chaque activité
+a un type, des tranches d'âge, une durée, un nombre de participants, du matériel,
+des consignes de sécurité et un thème narratif.
 
----
+- Tout le monde peut consulter les activités publiées, même sans compte.
+- Toute personne ayant un compte peut créer des activités (brouillon → publiée → archivée).
+- Les modérateur·rice·s peuvent modifier, archiver ou supprimer n'importe quelle activité.
+- Les types d'activité et les tranches d'âge se gèrent directement dans Supabase.
+
+## Structure
+
+```
+src/
+  pages/        Catalog, ActivityDetail, ActivityForm, MyActivities, Profile, Login, Register
+  services/     accès Supabase (activités, profil, données de référence)
+  contexts/     session + profil de l'utilisateur connecté
+  types/        database.ts (généré depuis Supabase) + types métier
+supabase/migrations/  SQL appliqué sur la base (RLS, triggers, index)
+```
 
 ## 🚀 Démarrer le projet sur une nouvelle machine
 

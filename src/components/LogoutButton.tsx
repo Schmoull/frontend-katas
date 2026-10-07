@@ -1,16 +1,13 @@
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/useAuth";
 
-/**
- * Bouton de déconnexion :
- * - supprime l'utilisateur stocké dans le localStorage
- * - redirige vers la page de connexion
- */
 export default function LogoutButton() {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/login");
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
   };
 
   return (

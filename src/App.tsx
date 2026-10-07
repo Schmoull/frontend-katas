@@ -1,128 +1,63 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import Home from "./pages/Home";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
+import Catalog from "./pages/Catalog";
 import Login from "./pages/Login";
-import CreateCamp from "./pages/CreateCamp";
-import Camp from "./pages/Camp";
-import CampDetails from "./pages/CampDetails";
-import Profile from "./pages/Profile";
-import CampDashboard from "./pages/CampDashboard";
-import ProtectedRoute from "./routes/ProtectedRoute";
-import CampObjectives from "./pages/CampObjectives";
-import CampFilRouge from "./pages/CampFilRouge";
-import CampPlanning from "./pages/CampPlanning";
-import CampActivites from "./pages/CampActivites";
-import CampSettings from "./pages/CampSettings";
 import Register from "./pages/Register";
-import JoinCamp from "./pages/JoinCamp";
+import ActivityDetail from "./pages/ActivityDetail";
+import ActivityForm from "./pages/ActivityForm";
+import MyActivities from "./pages/MyActivities";
+import Profile from "./pages/Profile";
+import ProtectedRoute from "./routes/ProtectedRoute";
+
+// key : remonte le formulaire quand on passe d'une activité à une autre
+function EditActivity() {
+  const { id } = useParams();
+  return <ActivityForm key={id} />;
+}
 
 export default function App() {
   return (
     <Routes>
-      {/* Si on arrive sur la racine, on redirige */}
-      <Route path="/" element={<Navigate to="/login" />} />
-
-      {/* Route publique */}
+      {/* Routes publiques : le catalogue est lisible sans compte */}
+      <Route path="/" element={<Catalog />} />
       <Route path="/login" element={<Login />} />
-
       <Route path="/register" element={<Register />} />
 
       {/* Routes protégées */}
       <Route
-        path="/home"
+        path="/activites/nouvelle"
         element={
           <ProtectedRoute>
-            <Home />
+            <ActivityForm key="new" />
           </ProtectedRoute>
         }
       />
       <Route
-        path="/create-camp"
+        path="/activites/:id/modifier"
         element={
           <ProtectedRoute>
-            <CreateCamp />
+            <EditActivity />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/activites/:id" element={<ActivityDetail />} />
+      <Route
+        path="/mes-activites"
+        element={
+          <ProtectedRoute>
+            <MyActivities />
           </ProtectedRoute>
         }
       />
       <Route
-        path="/camp/:id"
-        element={
-          <ProtectedRoute>
-            <Camp />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/camp/:id/details"
-        element={
-          <ProtectedRoute>
-            <CampDetails />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/profile"
+        path="/profil"
         element={
           <ProtectedRoute>
             <Profile />
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/camp/:id/dashboard"
-        element={
-          <ProtectedRoute>
-            <CampDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/camp/:id/objectifs"
-        element={
-          <ProtectedRoute>
-            <CampObjectives />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/camp/:id/fil-rouge"
-        element={
-          <ProtectedRoute>
-            <CampFilRouge />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/camp/:id/planning"
-        element={
-          <ProtectedRoute>
-            <CampPlanning />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/camp/:id/activites"
-        element={
-          <ProtectedRoute>
-            <CampActivites />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/camp/:id/parametres"
-        element={
-          <ProtectedRoute>
-            <CampSettings />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/join"
-        element={
-          <ProtectedRoute>
-            <JoinCamp />
-          </ProtectedRoute>
-        }
-      />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

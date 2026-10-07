@@ -1,21 +1,24 @@
 // src/pages/Login.tsx
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Navigate, useLocation, Link } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../contexts/useAuth";
 import type { FormEvent } from "react";
 
 export default function Login() {
-  const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Si déjà connecté → redirection
+  // Page demandée avant la redirection vers /login (cf. ProtectedRoute)
+  const from = (location.state as { from?: string } | null)?.from ?? "/";
+
+  // Déjà connecté (ou connexion réussie) → redirection
   if (user) {
-    navigate("/home");
+    return <Navigate to={from} replace />;
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -23,7 +26,7 @@ export default function Login() {
     setErrorMsg(null);
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -33,19 +36,11 @@ export default function Login() {
     if (error) {
       console.error("Erreur login Supabase :", error);
       setErrorMsg(error.message || "Connexion impossible.");
-      return;
     }
-
-    if (!data.session) {
-      setErrorMsg("Aucune session créée. Vérifie ton email/mot de passe.");
-      return;
-    }
-
-    navigate("/home");
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100">
+    <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-gray-900">Connexion</h1>
 
@@ -53,8 +48,11 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-sm font-medium mb-1" htmlFor="email">
+              Email
+            </label>
             <input
+              id="email"
               type="email"
               className="w-full border border-gray-300 rounded-md p-2"
               value={email}
@@ -65,10 +63,14 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="password"
+            >
               Mot de passe
             </label>
             <input
+              id="password"
               type="password"
               className="w-full border border-gray-300 rounded-md p-2"
               value={password}
@@ -91,6 +93,11 @@ export default function Login() {
           Pas encore de compte ?{" "}
           <Link to="/register" className="text-indigo-600 hover:underline">
             Créer un compte
+          </Link>
+        </p>
+        <p className="mt-2 text-sm text-gray-600">
+          <Link to="/" className="text-indigo-600 hover:underline">
+            ← Parcourir le catalogue sans compte
           </Link>
         </p>
       </div>

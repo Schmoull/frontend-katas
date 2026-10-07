@@ -1,0 +1,285 @@
+// Généré depuis Supabase (generate_typescript_types). Ne pas éditer à la main.
+
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5";
+  };
+  public: {
+    Tables: {
+      activities: {
+        Row: {
+          activity_type_id: string;
+          created_at: string;
+          created_by: string;
+          description: string | null;
+          duration_minutes: number | null;
+          id: string;
+          location_type: string | null;
+          material_needed: string | null;
+          max_participants: number | null;
+          min_participants: number | null;
+          narrative_theme: string | null;
+          pedagogical_objective: string | null;
+          published_at: string | null;
+          safety_notes: string | null;
+          status: string;
+          theme_adaptation_notes: string | null;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          activity_type_id: string;
+          created_at?: string;
+          created_by: string;
+          description?: string | null;
+          duration_minutes?: number | null;
+          id?: string;
+          location_type?: string | null;
+          material_needed?: string | null;
+          max_participants?: number | null;
+          min_participants?: number | null;
+          narrative_theme?: string | null;
+          pedagogical_objective?: string | null;
+          published_at?: string | null;
+          safety_notes?: string | null;
+          status?: string;
+          theme_adaptation_notes?: string | null;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          activity_type_id?: string;
+          created_at?: string;
+          created_by?: string;
+          description?: string | null;
+          duration_minutes?: number | null;
+          id?: string;
+          location_type?: string | null;
+          material_needed?: string | null;
+          max_participants?: number | null;
+          min_participants?: number | null;
+          narrative_theme?: string | null;
+          pedagogical_objective?: string | null;
+          published_at?: string | null;
+          safety_notes?: string | null;
+          status?: string;
+          theme_adaptation_notes?: string | null;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "activities_activity_type_id_fkey";
+            columns: ["activity_type_id"];
+            isOneToOne: false;
+            referencedRelation: "activity_types";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "activities_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      activity_age_branches: {
+        Row: {
+          activity_id: string;
+          age_branch_id: string;
+        };
+        Insert: {
+          activity_id: string;
+          age_branch_id: string;
+        };
+        Update: {
+          activity_id?: string;
+          age_branch_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "activity_age_branches_activity_id_fkey";
+            columns: ["activity_id"];
+            isOneToOne: false;
+            referencedRelation: "activities";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "activity_age_branches_age_branch_id_fkey";
+            columns: ["age_branch_id"];
+            isOneToOne: false;
+            referencedRelation: "age_branches";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      activity_types: {
+        Row: {
+          description: string | null;
+          id: string;
+          name: string;
+        };
+        Insert: {
+          description?: string | null;
+          id?: string;
+          name: string;
+        };
+        Update: {
+          description?: string | null;
+          id?: string;
+          name?: string;
+        };
+        Relationships: [];
+      };
+      age_branches: {
+        Row: {
+          id: string;
+          max_age: number;
+          min_age: number;
+          name: string;
+        };
+        Insert: {
+          id?: string;
+          max_age: number;
+          min_age: number;
+          name: string;
+        };
+        Update: {
+          id?: string;
+          max_age?: number;
+          min_age?: number;
+          name?: string;
+        };
+        Relationships: [];
+      };
+      profiles: {
+        Row: {
+          created_at: string;
+          display_name: string;
+          id: string;
+          role: string;
+        };
+        Insert: {
+          created_at?: string;
+          display_name: string;
+          id: string;
+          role?: string;
+        };
+        Update: {
+          created_at?: string;
+          display_name?: string;
+          id?: string;
+          role?: string;
+        };
+        Relationships: [];
+      };
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      is_moderator: { Args: never; Returns: boolean };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
+};
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<
+  keyof Database,
+  "public"
+>];
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I;
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I;
+      }
+      ? I
+      : never
+    : never;
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U;
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U;
+      }
+      ? U
+      : never
+    : never;

@@ -1,19 +1,21 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../contexts/useAuth";
 import type { FormEvent } from "react";
 
 export default function Register() {
-  const navigate = useNavigate();
   const { user } = useAuth();
+  const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [confirmationSent, setConfirmationSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Inscription sans confirmation email → session directe
   if (user) {
-    navigate("/home");
+    return <Navigate to="/" replace />;
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -24,6 +26,8 @@ export default function Register() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      // Lu par le trigger handle_new_user pour créer le profil
+      options: { data: { display_name: displayName.trim() } },
     });
 
     setLoading(false);
@@ -34,19 +38,32 @@ export default function Register() {
       return;
     }
 
-    if (!data.user) {
-      setErrorMsg(
-        "Inscription effectuée, mais utilisateur non disponible. Vérifie tes emails.",
-      );
-      return;
+    if (!data.session) {
+      setConfirmationSent(true);
     }
+  }
 
-    // Option simple : rediriger vers le login après inscription
-    navigate("/login");
+  if (confirmationSent) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+        <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-md space-y-4">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Vérifie tes emails
+          </h1>
+          <p className="text-gray-600">
+            Un lien de confirmation a été envoyé à <strong>{email}</strong>.
+            Clique dessus pour activer ton compte, puis connecte-toi.
+          </p>
+          <Link to="/login" className="text-indigo-600 hover:underline">
+            Aller à la connexion
+          </Link>
+        </div>
+      </main>
+    );
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100">
+    <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-gray-900">
           Créer un compte
@@ -56,8 +73,29 @@ export default function Register() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="display_name"
+            >
+              Nom affiché
+            </label>
             <input
+              id="display_name"
+              type="text"
+              className="w-full border border-gray-300 rounded-md p-2"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              autoComplete="nickname"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1" htmlFor="email">
+              Email
+            </label>
+            <input
+              id="email"
               type="email"
               className="w-full border border-gray-300 rounded-md p-2"
               value={email}
@@ -68,15 +106,20 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label
+              className="block text-sm font-medium mb-1"
+              htmlFor="password"
+            >
               Mot de passe
             </label>
             <input
+              id="password"
               type="password"
               className="w-full border border-gray-300 rounded-md p-2"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="new-password"
+              minLength={6}
               required
             />
           </div>
