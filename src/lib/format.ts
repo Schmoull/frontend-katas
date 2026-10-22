@@ -1,12 +1,22 @@
 // src/lib/format.ts
+// Textes dans la langue active. Les composants qui les appellent passent
+// par useTranslation : ils se ré-affichent quand la langue change.
+import i18n from "i18next";
+import type { Translation } from "../i18n/fr";
+import { LOCALES, currentLanguage, localizedName } from "../i18n/languages";
 import type { AgeBranch } from "../types";
 
 export function formatDuration(minutes: number | null): string | null {
   if (minutes == null) return null;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  if (h === 0) return `${m} min`;
-  return m === 0 ? `${h} h` : `${h} h ${String(m).padStart(2, "0")}`;
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  if (hours === 0) return i18n.t("format.durationMinutes", { minutes: rest });
+  return rest === 0
+    ? i18n.t("format.durationHours", { hours })
+    : i18n.t("format.durationHoursMinutes", {
+        hours,
+        minutes: String(rest).padStart(2, "0"),
+      });
 }
 
 export function formatParticipants(
@@ -14,59 +24,77 @@ export function formatParticipants(
   max: number | null,
 ): string | null {
   if (min != null && max != null)
-    return min === max ? `${min} participants` : `${min} à ${max} participants`;
-  if (min != null) return `${min} participants min.`;
-  if (max != null) return `${max} participants max.`;
+    return min === max
+      ? i18n.t("format.participantsExact", { count: min })
+      : i18n.t("format.participantsRange", { min, max });
+  if (min != null) return i18n.t("format.participantsMin", { count: min });
+  if (max != null) return i18n.t("format.participantsMax", { count: max });
   return null;
 }
 
 // max_age = 99 signifie « pas de limite d'âge » (ex. Routiers)
 const NO_MAX_AGE = 99;
 
-export function formatAgeBranch(branch: AgeBranch): string {
+export function formatAgeBranch(
+  branch: Pick<AgeBranch, "name" | "name_de" | "min_age" | "max_age">,
+): string {
+  const name = localizedName(branch);
   if (branch.max_age >= NO_MAX_AGE)
-    return `${branch.name} (dès ${branch.min_age} ans)`;
-  return `${branch.name} (${branch.min_age}–${branch.max_age} ans)`;
+    return i18n.t("format.ageFrom", { name, min: branch.min_age });
+  return i18n.t("format.ageRange", {
+    name,
+    min: branch.min_age,
+    max: branch.max_age,
+  });
 }
 
 export function formatDate(iso: string | null): string | null {
   if (!iso) return null;
-  return new Date(iso).toLocaleDateString("fr-CH", {
+  return new Date(iso).toLocaleDateString(LOCALES[currentLanguage()], {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
 }
 
-// Contraintes de la base (CHECK, UNIQUE, clés étrangères) → message lisible
-const CONSTRAINT_MESSAGES: Record<string, string> = {
-  activities_participants_range_check:
-    "Le nombre minimum de participants dépasse le nombre maximum.",
-  activities_participants_positive_check:
-    "Le nombre de participants doit être d'au moins 1.",
-  activities_duration_positive_check:
-    "La durée doit être supérieure à 0 minute.",
-  age_branches_age_range_check:
-    "L'âge minimum doit être positif et ne pas dépasser l'âge maximum.",
-  characteristic_forms_position_check: "Le numéro doit être d'au moins 1.",
-  activity_types_name_key: "Un type porte déjà ce nom.",
-  age_branches_name_key: "Une tranche d'âge porte déjà ce nom.",
-  characteristic_forms_name_key: "Une forme caractéristique porte déjà ce nom.",
-  characteristic_forms_position_key:
-    "Une forme caractéristique porte déjà ce numéro.",
-  activity_characteristic_forms_characteristic_form_id_fkey:
-    "Cette forme est utilisée par des activités : impossible de la supprimer.",
+type ErrorKey = keyof Translation["errors"];
+
+// Contraintes de la base (CHECK, UNIQUE, clés étrangères) : leur nom
+// apparaît dans le message Postgres
+const CONSTRAINT_KEYS: ErrorKey[] = [
+  "activities_participants_range_check",
+  "activities_participants_positive_check",
+  "activities_duration_positive_check",
+  "age_branches_age_range_check",
+  "characteristic_forms_position_check",
+  "activity_types_name_key",
+  "age_branches_name_key",
+  "characteristic_forms_name_key",
+  "characteristic_forms_position_key",
+  "activity_characteristic_forms_characteristic_form_id_fkey",
+];
+
+// Messages levés par nos fonctions SQL (raise exception), en français
+const SERVER_MESSAGES: Record<string, ErrorKey> = {
+  "Au moins une forme caractéristique est obligatoire": "formRequired",
+  "Activité introuvable ou non modifiable": "activityNotEditable",
+  "Réservé aux administrateurs": "adminOnly",
+  "Tu ne peux pas changer ton propre rôle": "ownRole",
+  "Utilisateur introuvable": "userNotFound",
+  "Type introuvable": "typeNotFound",
+  "Le type « Inconnu » ne peut pas être supprimé": "fallbackType",
 };
 
-// Les messages d'erreur Supabase ne sont pas des Error natives
+// Les erreurs Supabase ne sont pas des Error natives. Un refus connu est
+// traduit ; un autre message est affiché tel quel ; sinon le fallback.
 export function errorMessage(e: unknown, fallback: string): string {
   if (e && typeof e === "object" && "message" in e) {
     const message = (e as { message: unknown }).message;
     if (typeof message === "string" && message) {
-      const constraint = Object.keys(CONSTRAINT_MESSAGES).find((name) =>
-        message.includes(name),
-      );
-      return constraint ? CONSTRAINT_MESSAGES[constraint] : message;
+      const key =
+        SERVER_MESSAGES[message] ??
+        CONSTRAINT_KEYS.find((name) => message.includes(name));
+      return key ? i18n.t(`errors.${key}`) : message;
     }
   }
   return fallback;

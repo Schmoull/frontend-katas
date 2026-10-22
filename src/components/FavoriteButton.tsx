@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   addFavorite,
   isFavorite,
@@ -8,6 +9,7 @@ import { errorMessage } from "../lib/format";
 
 // À n'afficher que pour un utilisateur connecté
 export default function FavoriteButton({ activityId }: { activityId: string }) {
+  const { t } = useTranslation();
   const [favorite, setFavorite] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -34,7 +36,7 @@ export default function FavoriteButton({ activityId }: { activityId: string }) {
         setFavorite(true);
       }
     } catch (e) {
-      alert(errorMessage(e, "Impossible de modifier les favoris."));
+      alert(errorMessage(e, t("favorite.error")));
     } finally {
       setBusy(false);
     }
@@ -51,7 +53,7 @@ export default function FavoriteButton({ activityId }: { activityId: string }) {
           : "border-gray-300 bg-white hover:bg-gray-50"
       }`}
     >
-      {favorite ? "★ Dans mes favoris" : "☆ Ajouter aux favoris"}
+      {favorite ? t("favorite.remove") : t("favorite.add")}
     </button>
   );
 }

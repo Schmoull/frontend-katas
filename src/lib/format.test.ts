@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
+import i18n from "i18next";
 import {
   errorMessage,
   formatAgeBranch,
@@ -6,6 +7,11 @@ import {
   formatDuration,
   formatParticipants,
 } from "./format";
+
+// setupTests.ts démarre en français ; un test en allemand revient au français
+afterEach(async () => {
+  await i18n.changeLanguage("fr");
+});
 
 describe("formatDuration", () => {
   it("renvoie null sans durée", () => {
@@ -18,20 +24,38 @@ describe("formatDuration", () => {
     expect(formatDuration(90)).toBe("1 h 30");
     expect(formatDuration(125)).toBe("2 h 05");
   });
+
+  it("parle allemand", async () => {
+    await i18n.changeLanguage("de");
+    expect(formatDuration(45)).toBe("45 Min.");
+    expect(formatDuration(125)).toBe("2 Std. 05");
+  });
 });
 
 describe("formatParticipants", () => {
   it("gère toutes les combinaisons de min et max", () => {
     expect(formatParticipants(null, null)).toBeNull();
     expect(formatParticipants(8, 8)).toBe("8 participants");
+    expect(formatParticipants(1, 1)).toBe("1 participant");
     expect(formatParticipants(5, 20)).toBe("5 à 20 participants");
     expect(formatParticipants(5, null)).toBe("5 participants min.");
     expect(formatParticipants(null, 20)).toBe("20 participants max.");
   });
+
+  it("parle allemand", async () => {
+    await i18n.changeLanguage("de");
+    expect(formatParticipants(5, 20)).toBe("5 bis 20 Teilnehmende");
+    expect(formatParticipants(5, null)).toBe("mind. 5 Teilnehmende");
+  });
 });
 
 describe("formatAgeBranch", () => {
-  const branch = { id: "b", name: "Louveteaux", min_age: 6, max_age: 10 };
+  const branch = {
+    name: "Louveteaux",
+    name_de: "Wölfe",
+    min_age: 6,
+    max_age: 10,
+  };
 
   it("affiche la tranche d'âge", () => {
     expect(formatAgeBranch(branch)).toBe("Louveteaux (6–10 ans)");
@@ -40,12 +64,20 @@ describe("formatAgeBranch", () => {
   it("traite 99 comme « pas de limite »", () => {
     expect(
       formatAgeBranch({
-        ...branch,
         name: "Routiers",
+        name_de: "Rover",
         min_age: 17,
         max_age: 99,
       }),
     ).toBe("Routiers (dès 17 ans)");
+  });
+
+  it("utilise le nom allemand, ou le français s'il manque", async () => {
+    await i18n.changeLanguage("de");
+    expect(formatAgeBranch(branch)).toBe("Wölfe (6–10 Jahre)");
+    expect(formatAgeBranch({ ...branch, name_de: null })).toBe(
+      "Louveteaux (6–10 Jahre)",
+    );
   });
 });
 
@@ -54,9 +86,11 @@ describe("formatDate", () => {
     expect(formatDate(null)).toBeNull();
   });
 
-  it("formate en français", () => {
+  it("formate dans la langue active", async () => {
     // Midi UTC : même jour quel que soit le fuseau de la machine
     expect(formatDate("2026-10-07T12:00:00Z")).toBe("7 octobre 2026");
+    await i18n.changeLanguage("de");
+    expect(formatDate("2026-10-07T12:00:00Z")).toBe("7. Oktober 2026");
   });
 });
 
@@ -79,9 +113,16 @@ describe("errorMessage", () => {
     expect(errorMessage(error, "fallback")).toBe("Un type porte déjà ce nom.");
   });
 
+  it("traduit un message levé par une fonction SQL", async () => {
+    const error = { message: "Réservé aux administrateurs" };
+    expect(errorMessage(error, "x")).toBe("Réservé aux administrateurs.");
+    await i18n.changeLanguage("de");
+    expect(errorMessage(error, "x")).toBe("Nur für Administrator:innen.");
+  });
+
   it("garde le message d'origine s'il n'est pas connu", () => {
-    expect(errorMessage({ message: "Réservé aux administrateurs" }, "x")).toBe(
-      "Réservé aux administrateurs",
+    expect(errorMessage({ message: "Invalid login credentials" }, "x")).toBe(
+      "Invalid login credentials",
     );
   });
 

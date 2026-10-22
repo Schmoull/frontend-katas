@@ -1,5 +1,6 @@
 // src/types/index.ts
 import type { Tables } from "./database";
+import type { ContentLanguage } from "../i18n/languages";
 
 export type Profile = Tables<"profiles">;
 export type ActivityType = Tables<"activity_types">;
@@ -8,7 +9,8 @@ export type AgeBranch = Tables<"age_branches">;
 export type CharacteristicForm = Tables<"characteristic_forms">;
 export type ActivityRow = Tables<"activities">;
 
-// Valeurs autorisées par les contraintes CHECK de la base.
+// Valeurs autorisées par les contraintes CHECK de la base. Leurs libellés
+// sont dans les traductions (roles.*, statuses.*, locations.*).
 // Rôles du plus faible au plus fort : chacun a les droits des précédents.
 export const ROLES = [
   "visiteur",
@@ -24,13 +26,6 @@ export type ActivityStatus = (typeof ACTIVITY_STATUSES)[number];
 export const LOCATION_TYPES = ["interieur", "exterieur", "les_deux"] as const;
 export type LocationType = (typeof LOCATION_TYPES)[number];
 
-export const ROLE_LABELS: Record<Role, string> = {
-  visiteur: "Visiteur·euse",
-  contributeur: "Contributeur·rice",
-  moderateur: "Modérateur·rice",
-  administrateur: "Administrateur·rice",
-};
-
 // Ligne renvoyée par la fonction list_users (page d'administration)
 export type UserAccount = {
   id: string;
@@ -40,21 +35,9 @@ export type UserAccount = {
   created_at: string;
 };
 
-export const STATUS_LABELS: Record<ActivityStatus, string> = {
-  draft: "Brouillon",
-  published: "Publiée",
-  archived: "Archivée",
-};
-
-export const LOCATION_LABELS: Record<LocationType, string> = {
-  interieur: "Intérieur",
-  exterieur: "Extérieur",
-  les_deux: "Intérieur ou extérieur",
-};
-
 // Activité avec ses relations, telle que renvoyée par activitiesService
 export type Activity = ActivityRow & {
-  activity_type: Pick<ActivityType, "id" | "name"> | null;
+  activity_type: Pick<ActivityType, "id" | "name" | "name_de"> | null;
   age_branches: AgeBranch[];
   characteristic_forms: CharacteristicForm[];
   author: Pick<Profile, "id" | "display_name"> | null;
@@ -64,6 +47,7 @@ export type Activity = ActivityRow & {
 export type ActivityInput = {
   title: string;
   activity_type_id: string;
+  language: ContentLanguage;
   description: string | null;
   pedagogical_objective: string | null;
   duration_minutes: number | null;

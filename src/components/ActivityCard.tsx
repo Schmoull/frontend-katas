@@ -1,7 +1,13 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import StatusBadge from "./StatusBadge";
 import { formatDuration, formatParticipants } from "../lib/format";
-import { LOCATION_LABELS, type Activity, type LocationType } from "../types";
+import {
+  currentLanguage,
+  localizedName,
+  type ContentLanguage,
+} from "../i18n/languages";
+import type { Activity, LocationType } from "../types";
 
 type ActivityCardProps = {
   activity: Activity;
@@ -19,11 +25,12 @@ export default function ActivityCard({
   showStatus = false,
   showAuthor = false,
 }: ActivityCardProps) {
+  const { t } = useTranslation();
   const details = [
     formatDuration(activity.duration_minutes),
     formatParticipants(activity.min_participants, activity.max_participants),
     activity.location_type
-      ? LOCATION_LABELS[activity.location_type as LocationType]
+      ? t(`locations.${activity.location_type as LocationType}`)
       : null,
   ].filter(Boolean);
 
@@ -32,16 +39,30 @@ export default function ActivityCard({
       <div className="flex flex-1 flex-col p-4">
         <div className="flex items-start justify-between gap-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
-            {activity.activity_type?.name}
+            {activity.activity_type && localizedName(activity.activity_type)}
           </p>
-          {showStatus && <StatusBadge status={activity.status} />}
+          <div className="flex gap-1">
+            {/* Langue du contenu, signalée si ce n'est pas celle de l'interface */}
+            {activity.language !== currentLanguage() && (
+              <span
+                lang={activity.language}
+                title={t(`language.${activity.language as ContentLanguage}`)}
+                className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold uppercase text-gray-700"
+              >
+                {activity.language}
+              </span>
+            )}
+            {showStatus && <StatusBadge status={activity.status} />}
+          </div>
         </div>
 
-        <h3 className="mt-1 text-lg font-semibold">{activity.title}</h3>
+        <h3 className="mt-1 text-lg font-semibold" lang={activity.language}>
+          {activity.title}
+        </h3>
 
         {showAuthor && activity.author && (
           <p className="text-xs text-gray-500">
-            Par {activity.author.display_name}
+            {t("common.by", { name: activity.author.display_name })}
           </p>
         )}
 
@@ -50,7 +71,7 @@ export default function ActivityCard({
         )}
 
         {activity.description && (
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-600" lang={activity.language}>
             {truncate(activity.description, 120)}
           </p>
         )}
@@ -59,15 +80,15 @@ export default function ActivityCard({
           // Intitulés trop longs pour la carte : numéro + intitulé au survol
           <ul
             className="mt-3 flex flex-wrap gap-1"
-            aria-label="Formes caractéristiques"
+            aria-label={t("card.formsLabel")}
           >
             {activity.characteristic_forms.map((form) => (
               <li
                 key={form.id}
-                title={form.name}
+                title={localizedName(form)}
                 className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700"
               >
-                FC {form.position}
+                {t("card.formBadge", { position: form.position })}
               </li>
             ))}
           </ul>
@@ -80,7 +101,7 @@ export default function ActivityCard({
                 key={branch.id}
                 className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs text-indigo-700"
               >
-                {branch.name}
+                {localizedName(branch)}
               </li>
             ))}
           </ul>
@@ -91,7 +112,7 @@ export default function ActivityCard({
             to={`/activites/${activity.id}`}
             className="inline-block px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
           >
-            Voir l'activité
+            {t("card.view")}
           </Link>
         </div>
       </div>

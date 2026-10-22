@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import MainLayout from "../layouts/MainLayout";
 import ActivityCard from "../components/ActivityCard";
 import { useAuth } from "../contexts/useAuth";
 import { listMyActivities } from "../services/activitiesService";
 import {
   ACTIVITY_STATUSES,
-  STATUS_LABELS,
   type Activity,
   type ActivityStatus,
 } from "../types";
 
 export default function MyActivities() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const userId = user?.id;
 
@@ -30,7 +31,7 @@ export default function MyActivities() {
       })
       .catch((e) => {
         console.error("Erreur chargement de mes activités :", e);
-        if (!cancelled) setError("Impossible de charger tes activités.");
+        if (!cancelled) setError(t("myActivities.loadError"));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -39,7 +40,7 @@ export default function MyActivities() {
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [userId, t]);
 
   const visible = statusFilter
     ? activities.filter((a) => a.status === statusFilter)
@@ -49,12 +50,14 @@ export default function MyActivities() {
     <MainLayout>
       <section>
         <header className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Mes activités</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {t("myActivities.title")}
+          </h1>
           <Link
             to="/activites/nouvelle"
             className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
           >
-            Nouvelle activité
+            {t("myActivities.newActivity")}
           </Link>
         </header>
 
@@ -69,20 +72,20 @@ export default function MyActivities() {
                   : "bg-white text-gray-700 hover:bg-indigo-100"
               }`}
             >
-              {status ? STATUS_LABELS[status] : "Toutes"}
+              {status ? t(`statuses.${status}`) : t("myActivities.all")}
             </button>
           ))}
         </div>
 
         {loading ? (
-          <p className="text-gray-600">Chargement…</p>
+          <p className="text-gray-600">{t("common.loading")}</p>
         ) : error ? (
           <p className="text-red-600">{error}</p>
         ) : visible.length === 0 ? (
           <p className="text-gray-600">
             {activities.length === 0
-              ? "Tu n'as encore créé aucune activité."
-              : "Aucune activité avec ce statut."}
+              ? t("myActivities.empty")
+              : t("myActivities.emptyStatus")}
           </p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

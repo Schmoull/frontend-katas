@@ -1,4 +1,5 @@
-import { STATUS_LABELS, type ActivityStatus } from "../types";
+import { useTranslation } from "react-i18next";
+import type { ActivityStatus } from "../types";
 
 const STATUS_CLASSES: Record<ActivityStatus, string> = {
   draft: "bg-amber-100 text-amber-800",
@@ -7,12 +8,13 @@ const STATUS_CLASSES: Record<ActivityStatus, string> = {
 };
 
 export default function StatusBadge({ status }: { status: string }) {
+  const { t } = useTranslation();
   const s = status as ActivityStatus;
   return (
     <span
       className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_CLASSES[s]}`}
     >
-      {STATUS_LABELS[s]}
+      {t(`statuses.${s}`)}
     </span>
   );
 }

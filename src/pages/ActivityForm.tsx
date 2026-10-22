@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import MainLayout from "../layouts/MainLayout";
 import { useAuth } from "../contexts/useAuth";
 import { useReferenceData } from "../hooks/useReferenceData";
@@ -8,7 +9,12 @@ import { getActivity, saveActivity } from "../services/activitiesService";
 import { errorMessage, formatAgeBranch } from "../lib/format";
 import { activityPermissions } from "../lib/permissions";
 import {
-  LOCATION_LABELS,
+  CONTENT_LANGUAGES,
+  currentLanguage,
+  localizedName,
+  type ContentLanguage,
+} from "../i18n/languages";
+import {
   LOCATION_TYPES,
   type Activity,
   type ActivityInput,
@@ -20,6 +26,7 @@ import {
 type FormValues = {
   title: string;
   activity_type_id: string;
+  language: ContentLanguage;
   description: string;
   pedagogical_objective: string;
   duration_minutes: string;
@@ -36,28 +43,33 @@ type FormValues = {
 
 type IdListKey = "age_branch_ids" | "characteristic_form_ids";
 
-const EMPTY_VALUES: FormValues = {
-  title: "",
-  activity_type_id: "",
-  description: "",
-  pedagogical_objective: "",
-  duration_minutes: "",
-  min_participants: "",
-  max_participants: "",
-  location_type: "",
-  material_needed: "",
-  safety_notes: "",
-  narrative_theme: "",
-  theme_adaptation_notes: "",
-  age_branch_ids: [],
-  characteristic_form_ids: [],
-};
+// Une nouvelle activité est proposée dans la langue de l'interface
+function emptyValues(): FormValues {
+  return {
+    title: "",
+    activity_type_id: "",
+    language: currentLanguage(),
+    description: "",
+    pedagogical_objective: "",
+    duration_minutes: "",
+    min_participants: "",
+    max_participants: "",
+    location_type: "",
+    material_needed: "",
+    safety_notes: "",
+    narrative_theme: "",
+    theme_adaptation_notes: "",
+    age_branch_ids: [],
+    characteristic_form_ids: [],
+  };
+}
 
 function toFormValues(activity: Activity): FormValues {
   const str = (v: string | number | null) => (v == null ? "" : String(v));
   return {
     title: activity.title,
     activity_type_id: activity.activity_type_id,
+    language: activity.language as ContentLanguage,
     description: str(activity.description),
     pedagogical_objective: str(activity.pedagogical_objective),
     duration_minutes: str(activity.duration_minutes),
@@ -79,6 +91,7 @@ function toInput(values: FormValues, status: ActivityStatus): ActivityInput {
   return {
     title: values.title.trim(),
     activity_type_id: values.activity_type_id,
+    language: values.language,
     description: text(values.description),
     pedagogical_objective: text(values.pedagogical_objective),
     duration_minutes: int(values.duration_minutes),
@@ -119,6 +132,7 @@ function Field({
 }
 
 export default function ActivityForm() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const navigate = useNavigate();
@@ -132,7 +146,7 @@ export default function ActivityForm() {
     loading: refLoading,
   } = useReferenceData();
 
-  const [values, setValues] = useState<FormValues>(EMPTY_VALUES);
+  const [values, setValues] = useState<FormValues>(emptyValues);
   const [currentStatus, setCurrentStatus] = useState<ActivityStatus>("draft");
   const [loading, setLoading] = useState(isEdit);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -147,9 +161,9 @@ export default function ActivityForm() {
       .then((activity) => {
         if (cancelled) return;
         if (!activity) {
-          setLoadError("Activité introuvable.");
+          setLoadError(t("common.activityNotFound"));
         } else if (!activityPermissions(activity, userId, role).canEdit) {
-          setLoadError("Tu ne peux pas modifier cette activité.");
+          setLoadError(t("form.cannotEdit"));
         } else {
           setValues(toFormValues(activity));
           setCurrentStatus(activity.status as ActivityStatus);
@@ -157,7 +171,7 @@ export default function ActivityForm() {
       })
       .catch((e) => {
         console.error("Erreur chargement activité :", e);
-        if (!cancelled) setLoadError("Impossible de charger l'activité.");
+        if (!cancelled) setLoadError(t("common.loadActivityError"));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -166,6 +180,9 @@ export default function ActivityForm() {
     return () => {
       cancelled = true;
     };
+    // t volontairement absent : changer de langue ne doit pas recharger
+    // l'activité et écraser la saisie en cours
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, userId, role]);
 
   function set<K extends keyof FormValues>(key: K, value: FormValues[K]) {
@@ -194,7 +211,7 @@ export default function ActivityForm() {
     const input = toInput(values, status);
 
     if (input.characteristic_form_ids.length === 0) {
-      setFormError("Choisis au moins une forme caractéristique.");
+      setFormError(t("form.chooseForm"));
       return;
     }
 
@@ -203,9 +220,7 @@ export default function ActivityForm() {
       input.max_participants != null &&
       input.min_participants > input.max_participants
     ) {
-      setFormError(
-        "Le nombre minimum de participants dépasse le nombre maximum.",
-      );
+      setFormError(t("errors.activities_participants_range_check"));
       return;
     }
 
@@ -215,7 +230,7 @@ export default function ActivityForm() {
       navigate(`/activites/${activityId}`);
     } catch (e) {
       console.error("Erreur enregistrement activité :", e);
-      setFormError(errorMessage(e, "Impossible d'enregistrer l'activité."));
+      setFormError(errorMessage(e, t("form.saveError")));
       setSaving(false);
     }
   }
@@ -223,7 +238,7 @@ export default function ActivityForm() {
   if (loading) {
     return (
       <MainLayout>
-        <p className="text-gray-600">Chargement…</p>
+        <p className="text-gray-600">{t("common.loading")}</p>
       </MainLayout>
     );
   }
@@ -236,25 +251,26 @@ export default function ActivityForm() {
           to="/"
           className="mt-4 inline-block text-indigo-600 hover:underline"
         >
-          ← Retour au catalogue
+          {t("common.backToCatalog")}
         </Link>
       </MainLayout>
     );
   }
 
   const noTypes = !refLoading && activityTypes.length === 0;
+  // Le contenu saisi est dans la langue choisie pour l'activité
+  const lang = values.language;
 
   return (
     <MainLayout>
       <section className="max-w-3xl mx-auto">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">
-          {isEdit ? "Modifier l'activité" : "Nouvelle activité"}
+          {isEdit ? t("form.titleEdit") : t("form.titleNew")}
         </h1>
 
         {noTypes && (
           <p className="mb-4 rounded-md bg-amber-50 p-3 text-sm text-amber-800">
-            Aucun type d'activité n'est encore défini. Il faut en ajouter dans
-            Supabase avant de pouvoir créer une activité.
+            {t("form.noTypes")}
           </p>
         )}
 
@@ -262,10 +278,15 @@ export default function ActivityForm() {
           onSubmit={handleSubmit}
           className="bg-white p-6 rounded-xl shadow-sm grid gap-4 md:grid-cols-2"
         >
-          <Field label="Titre *" htmlFor="title" className="md:col-span-2">
+          <Field
+            label={t("form.title")}
+            htmlFor="title"
+            className="md:col-span-2"
+          >
             <input
               id="title"
               type="text"
+              lang={lang}
               className={inputClass}
               value={values.title}
               onChange={(e) => set("title", e.target.value)}
@@ -273,7 +294,7 @@ export default function ActivityForm() {
             />
           </Field>
 
-          <Field label="Type d'activité *" htmlFor="activity_type_id">
+          <Field label={t("form.type")} htmlFor="activity_type_id">
             <select
               id="activity_type_id"
               className={inputClass}
@@ -281,7 +302,7 @@ export default function ActivityForm() {
               onChange={(e) => set("activity_type_id", e.target.value)}
               required
             >
-              <option value="">Choisir…</option>
+              <option value="">{t("form.choose")}</option>
               {activityTypes
                 // « Inconnu » ne se choisit pas, sauf s'il est déjà attribué
                 .filter(
@@ -290,15 +311,33 @@ export default function ActivityForm() {
                 )
                 .map((type) => (
                   <option key={type.id} value={type.id}>
-                    {type.name}
+                    {localizedName(type)}
                   </option>
                 ))}
             </select>
           </Field>
 
+          <Field label={t("form.language")} htmlFor="language">
+            <select
+              id="language"
+              className={inputClass}
+              value={values.language}
+              onChange={(e) =>
+                set("language", e.target.value as ContentLanguage)
+              }
+              required
+            >
+              {CONTENT_LANGUAGES.map((option) => (
+                <option key={option} value={option}>
+                  {t(`language.${option}`)}
+                </option>
+              ))}
+            </select>
+          </Field>
+
           <fieldset className="md:col-span-2">
             <legend className="block text-sm font-medium mb-1">
-              Formes caractéristiques * (J+S Sport de camp/Trekking)
+              {t("form.forms")}
             </legend>
             <div className="space-y-2">
               {characteristicForms.map((form) => (
@@ -313,30 +352,30 @@ export default function ActivityForm() {
                   />
                   <span>
                     <span className="font-semibold">{form.position}.</span>{" "}
-                    {form.name}
+                    {localizedName(form)}
                   </span>
                 </label>
               ))}
             </div>
           </fieldset>
 
-          <Field label="Lieu" htmlFor="location_type">
+          <Field label={t("form.location")} htmlFor="location_type">
             <select
               id="location_type"
               className={inputClass}
               value={values.location_type}
               onChange={(e) => set("location_type", e.target.value)}
             >
-              <option value="">Non précisé</option>
+              <option value="">{t("form.unspecified")}</option>
               {LOCATION_TYPES.map((value) => (
                 <option key={value} value={value}>
-                  {LOCATION_LABELS[value]}
+                  {t(`locations.${value}`)}
                 </option>
               ))}
             </select>
           </Field>
 
-          <Field label="Durée (minutes)" htmlFor="duration_minutes">
+          <Field label={t("form.duration")} htmlFor="duration_minutes">
             <input
               id="duration_minutes"
               type="number"
@@ -347,8 +386,8 @@ export default function ActivityForm() {
             />
           </Field>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Participants min." htmlFor="min_participants">
+          <div className="grid grid-cols-2 gap-4 md:col-span-2">
+            <Field label={t("form.minParticipants")} htmlFor="min_participants">
               <input
                 id="min_participants"
                 type="number"
@@ -358,7 +397,7 @@ export default function ActivityForm() {
                 onChange={(e) => set("min_participants", e.target.value)}
               />
             </Field>
-            <Field label="Participants max." htmlFor="max_participants">
+            <Field label={t("form.maxParticipants")} htmlFor="max_participants">
               <input
                 id="max_participants"
                 type="number"
@@ -372,12 +411,10 @@ export default function ActivityForm() {
 
           <fieldset className="md:col-span-2">
             <legend className="block text-sm font-medium mb-1">
-              Tranches d'âge
+              {t("form.ageBranches")}
             </legend>
             {ageBranches.length === 0 ? (
-              <p className="text-sm text-gray-500">
-                Aucune tranche d'âge définie pour l'instant.
-              </p>
+              <p className="text-sm text-gray-500">{t("form.noAgeBranches")}</p>
             ) : (
               <div className="flex flex-wrap gap-3">
                 {ageBranches.map((branch) => (
@@ -395,12 +432,13 @@ export default function ActivityForm() {
           </fieldset>
 
           <Field
-            label="Description"
+            label={t("form.description")}
             htmlFor="description"
             className="md:col-span-2"
           >
             <textarea
               id="description"
+              lang={lang}
               className={`${inputClass} min-h-[100px]`}
               value={values.description}
               onChange={(e) => set("description", e.target.value)}
@@ -408,12 +446,13 @@ export default function ActivityForm() {
           </Field>
 
           <Field
-            label="Objectif pédagogique"
+            label={t("form.objective")}
             htmlFor="pedagogical_objective"
             className="md:col-span-2"
           >
             <textarea
               id="pedagogical_objective"
+              lang={lang}
               className={`${inputClass} min-h-[80px]`}
               value={values.pedagogical_objective}
               onChange={(e) => set("pedagogical_objective", e.target.value)}
@@ -421,12 +460,13 @@ export default function ActivityForm() {
           </Field>
 
           <Field
-            label="Matériel"
+            label={t("form.material")}
             htmlFor="material_needed"
             className="md:col-span-2"
           >
             <textarea
               id="material_needed"
+              lang={lang}
               className={`${inputClass} min-h-[60px]`}
               value={values.material_needed}
               onChange={(e) => set("material_needed", e.target.value)}
@@ -434,12 +474,13 @@ export default function ActivityForm() {
           </Field>
 
           <Field
-            label="Consignes de sécurité"
+            label={t("form.safety")}
             htmlFor="safety_notes"
             className="md:col-span-2"
           >
             <textarea
               id="safety_notes"
+              lang={lang}
               className={`${inputClass} min-h-[60px]`}
               value={values.safety_notes}
               onChange={(e) => set("safety_notes", e.target.value)}
@@ -447,12 +488,13 @@ export default function ActivityForm() {
           </Field>
 
           <Field
-            label="Thème narratif"
+            label={t("form.theme")}
             htmlFor="narrative_theme"
             className="md:col-span-2"
           >
             <textarea
               id="narrative_theme"
+              lang={lang}
               className={`${inputClass} min-h-[60px]`}
               value={values.narrative_theme}
               onChange={(e) => set("narrative_theme", e.target.value)}
@@ -460,12 +502,13 @@ export default function ActivityForm() {
           </Field>
 
           <Field
-            label="Comment adapter le thème"
+            label={t("form.themeAdaptation")}
             htmlFor="theme_adaptation_notes"
             className="md:col-span-2"
           >
             <textarea
               id="theme_adaptation_notes"
+              lang={lang}
               className={`${inputClass} min-h-[60px]`}
               value={values.theme_adaptation_notes}
               onChange={(e) => set("theme_adaptation_notes", e.target.value)}
@@ -481,7 +524,7 @@ export default function ActivityForm() {
               to={isEdit ? `/activites/${id}` : "/mes-activites"}
               className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50"
             >
-              Annuler
+              {t("common.cancel")}
             </Link>
             {isEdit ? (
               <button
@@ -490,7 +533,7 @@ export default function ActivityForm() {
                 disabled={saving || noTypes}
                 className="px-4 py-2 rounded-md border border-indigo-600 text-indigo-600 hover:bg-indigo-50 disabled:opacity-50"
               >
-                Enregistrer
+                {t("common.save")}
               </button>
             ) : (
               <button
@@ -499,7 +542,7 @@ export default function ActivityForm() {
                 disabled={saving || noTypes}
                 className="px-4 py-2 rounded-md border border-indigo-600 text-indigo-600 hover:bg-indigo-50 disabled:opacity-50"
               >
-                Enregistrer en brouillon
+                {t("form.saveDraft")}
               </button>
             )}
             {currentStatus !== "published" && (
@@ -509,7 +552,7 @@ export default function ActivityForm() {
                 disabled={saving || noTypes}
                 className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
               >
-                {isEdit ? "Enregistrer et publier" : "Publier"}
+                {isEdit ? t("form.saveAndPublish") : t("form.publish")}
               </button>
             )}
           </div>

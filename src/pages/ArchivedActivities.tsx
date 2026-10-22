@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import MainLayout from "../layouts/MainLayout";
 import ActivityCard from "../components/ActivityCard";
 import { listArchivedActivities } from "../services/activitiesService";
@@ -6,6 +7,7 @@ import type { Activity } from "../types";
 
 // Réservée aux modérateurs et administrateurs (route + RLS)
 export default function ArchivedActivities() {
+  const { t } = useTranslation();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -20,7 +22,7 @@ export default function ArchivedActivities() {
       })
       .catch((e) => {
         console.error("Erreur chargement des archives :", e);
-        if (!cancelled) setError("Impossible de charger les archives.");
+        if (!cancelled) setError(t("archives.loadError"));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -29,7 +31,7 @@ export default function ArchivedActivities() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   // Recherche locale : la liste des archives reste courte
   const query = search.trim().toLowerCase();
@@ -46,32 +48,29 @@ export default function ArchivedActivities() {
       <section>
         <header className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">
-            Activités archivées
+            {t("archives.title")}
           </h1>
-          <p className="text-gray-600">
-            Les activités retirées du catalogue. Ouvre une activité pour la
-            republier.
-          </p>
+          <p className="text-gray-600">{t("archives.subtitle")}</p>
         </header>
 
         <input
           type="search"
-          placeholder="Rechercher par titre ou auteur…"
-          aria-label="Rechercher par titre ou auteur"
+          placeholder={t("archives.searchPlaceholder")}
+          aria-label={t("archives.searchLabel")}
           className="mb-6 w-full max-w-md border border-gray-300 rounded-md p-2 bg-white"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
         {loading ? (
-          <p className="text-gray-600">Chargement…</p>
+          <p className="text-gray-600">{t("common.loading")}</p>
         ) : error ? (
           <p className="text-red-600">{error}</p>
         ) : visible.length === 0 ? (
           <p className="text-gray-600">
             {activities.length === 0
-              ? "Aucune activité archivée."
-              : "Aucune activité archivée ne correspond."}
+              ? t("archives.empty")
+              : t("archives.emptySearch")}
           </p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

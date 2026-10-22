@@ -6,15 +6,16 @@ import type {
   ActivityStatus,
   LocationType,
 } from "../types";
+import type { ContentLanguage } from "../i18n/languages";
 
 // Activité + type + tranches d'âge + formes caractéristiques (via les tables
 // de liaison) + auteur. La clé étrangère de l'auteur est nommée : favorites
 // relie aussi activities à profiles, PostgREST refuse sinon (PGRST201).
 export const ACTIVITY_SELECT = `
   *,
-  activity_type:activity_types(id, name),
-  age_branches(id, name, min_age, max_age),
-  characteristic_forms(id, position, name),
+  activity_type:activity_types(id, name, name_de),
+  age_branches(id, name, name_de, min_age, max_age),
+  characteristic_forms(id, position, name, name_de),
   author:profiles!activities_created_by_fkey(id, display_name)
 `;
 
@@ -37,6 +38,8 @@ export type CatalogFilters = {
   ageBranchId?: string;
   characteristicFormId?: string;
   locationType?: LocationType;
+  // Langue du contenu ; absente = toutes les langues
+  language?: ContentLanguage;
 };
 
 export async function listPublishedActivities(
@@ -62,6 +65,7 @@ export async function listPublishedActivities(
     query = query.eq("activity_type_id", filters.activityTypeId);
   if (filters.locationType)
     query = query.eq("location_type", filters.locationType);
+  if (filters.language) query = query.eq("language", filters.language);
   if (filters.ageBranchId)
     query = query.eq("branch_filter.age_branch_id", filters.ageBranchId);
   if (filters.characteristicFormId)

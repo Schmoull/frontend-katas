@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import MainLayout from "../layouts/MainLayout";
 import { useAuth } from "../contexts/useAuth";
 import { listUsers, setUserRole } from "../services/usersService";
 import { errorMessage, formatDate } from "../lib/format";
-import { ROLES, ROLE_LABELS, type Role, type UserAccount } from "../types";
+import { ROLES, type Role, type UserAccount } from "../types";
 
 export default function AdminUsers() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,8 +23,7 @@ export default function AdminUsers() {
       })
       .catch((e) => {
         console.error("Erreur chargement des utilisateurs :", e);
-        if (!cancelled)
-          setError(errorMessage(e, "Impossible de charger les utilisateurs."));
+        if (!cancelled) setError(errorMessage(e, t("adminUsers.loadError")));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -31,7 +32,7 @@ export default function AdminUsers() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   async function changeRole(account: UserAccount, role: Role) {
     setSavingId(account.id);
@@ -41,7 +42,7 @@ export default function AdminUsers() {
         list.map((u) => (u.id === account.id ? { ...u, role } : u)),
       );
     } catch (e) {
-      alert(errorMessage(e, "Impossible de changer le rôle."));
+      alert(errorMessage(e, t("adminUsers.roleError")));
     } finally {
       setSavingId(null);
     }
@@ -50,14 +51,13 @@ export default function AdminUsers() {
   return (
     <MainLayout>
       <section className="max-w-4xl">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Utilisateurs</h1>
-        <p className="mb-6 text-sm text-gray-600">
-          Visiteur → Contributeur → Modérateur → Administrateur : chaque rôle a
-          aussi les droits des rôles précédents.
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          {t("adminUsers.title")}
+        </h1>
+        <p className="mb-6 text-sm text-gray-600">{t("adminUsers.help")}</p>
 
         {loading ? (
-          <p className="text-gray-600">Chargement…</p>
+          <p className="text-gray-600">{t("common.loading")}</p>
         ) : error ? (
           <p className="text-red-600">{error}</p>
         ) : (
@@ -65,10 +65,10 @@ export default function AdminUsers() {
             <table className="w-full border-collapse text-sm">
               <thead className="bg-gray-100 text-left text-gray-600">
                 <tr>
-                  <th className="px-4 py-2">Nom</th>
-                  <th className="px-4 py-2">Email</th>
-                  <th className="px-4 py-2">Inscrit le</th>
-                  <th className="px-4 py-2">Rôle</th>
+                  <th className="px-4 py-2">{t("adminUsers.name")}</th>
+                  <th className="px-4 py-2">{t("adminUsers.email")}</th>
+                  <th className="px-4 py-2">{t("adminUsers.registered")}</th>
+                  <th className="px-4 py-2">{t("adminUsers.role")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -81,7 +81,11 @@ export default function AdminUsers() {
                     >
                       <td className="px-4 py-2 font-medium">
                         {account.display_name}
-                        {isMe && <span className="text-gray-500"> (toi)</span>}
+                        {isMe && (
+                          <span className="text-gray-500">
+                            {t("adminUsers.you")}
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-2">{account.email}</td>
                       <td className="px-4 py-2">
@@ -90,7 +94,9 @@ export default function AdminUsers() {
                       <td className="px-4 py-2">
                         {/* Son propre rôle n'est pas modifiable (refusé par la base) */}
                         <select
-                          aria-label={`Rôle de ${account.display_name}`}
+                          aria-label={t("adminUsers.roleOf", {
+                            name: account.display_name,
+                          })}
                           className="border border-gray-300 rounded-md p-1 bg-white disabled:opacity-60"
                           value={account.role}
                           disabled={isMe || savingId === account.id}
@@ -100,7 +106,7 @@ export default function AdminUsers() {
                         >
                           {ROLES.map((role) => (
                             <option key={role} value={role}>
-                              {ROLE_LABELS[role]}
+                              {t(`roles.${role}`)}
                             </option>
                           ))}
                         </select>

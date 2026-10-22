@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import LogoutButton from "../components/LogoutButton";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 import { useAuth } from "../contexts/useAuth";
-import { ROLE_LABELS, type Role } from "../types";
+import { ROLES, type Role } from "../types";
 
 type MainLayoutProps = {
   children: ReactNode;
@@ -24,10 +26,12 @@ function getInitials(name: string) {
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
+  const { t } = useTranslation();
   const { user, profile, hasRole } = useAuth();
 
   const displayName = profile?.display_name ?? user?.email ?? "";
-  const roleLabel = profile ? ROLE_LABELS[profile.role as Role] : null;
+  const role = profile?.role as Role | undefined;
+  const roleLabel = role && ROLES.includes(role) ? t(`roles.${role}`) : null;
 
   return (
     <div className="min-h-screen md:flex bg-gray-100 text-gray-900">
@@ -46,67 +50,70 @@ export default function MainLayout({ children }: MainLayoutProps) {
             </div>
           ) : (
             <p className="mb-8 text-center text-lg font-bold text-indigo-600">
-              Catalogue d'activités
+              {t("app.name")}
             </p>
           )}
 
           <nav className="space-y-2">
             <NavLink to="/" end className={navLinkClass}>
-              📚 Catalogue
+              {t("nav.catalog")}
             </NavLink>
 
             {user && (
               <NavLink to="/favoris" className={navLinkClass}>
-                ⭐ Mes favoris
+                {t("nav.favorites")}
               </NavLink>
             )}
 
             {hasRole("contributeur") && (
               <>
                 <NavLink to="/mes-activites" className={navLinkClass}>
-                  🗂️ Mes activités
+                  {t("nav.myActivities")}
                 </NavLink>
                 <NavLink to="/activites/nouvelle" className={navLinkClass}>
-                  ➕ Nouvelle activité
+                  {t("nav.newActivity")}
                 </NavLink>
               </>
             )}
 
             {hasRole("moderateur") && (
               <NavLink to="/archives" className={navLinkClass}>
-                📦 Archives
+                {t("nav.archives")}
               </NavLink>
             )}
 
             {hasRole("administrateur") && (
               <>
                 <NavLink to="/admin/utilisateurs" className={navLinkClass}>
-                  👥 Utilisateurs
+                  {t("nav.users")}
                 </NavLink>
                 <NavLink to="/admin/referentiel" className={navLinkClass}>
-                  🗃️ Données de référence
+                  {t("nav.referenceData")}
                 </NavLink>
               </>
             )}
 
             {user && (
               <NavLink to="/profil" className={navLinkClass}>
-                ⚙️ Profil
+                {t("nav.profile")}
               </NavLink>
             )}
           </nav>
         </div>
 
-        {user ? (
-          <LogoutButton />
-        ) : (
-          <Link
-            to="/login"
-            className="text-center bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition font-semibold"
-          >
-            Se connecter
-          </Link>
-        )}
+        <div className="space-y-4">
+          <LanguageSwitcher />
+          {user ? (
+            <LogoutButton />
+          ) : (
+            <Link
+              to="/login"
+              className="block text-center bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition font-semibold"
+            >
+              {t("nav.login")}
+            </Link>
+          )}
+        </div>
       </aside>
 
       {/* ----- Zone de contenu principale ----- */}

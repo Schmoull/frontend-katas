@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import type { FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { errorMessage } from "../lib/format";
 
 // Tableau éditable générique pour une liste de données de référence :
@@ -49,6 +50,7 @@ export default function ReferenceTable<T extends { id: string }>({
   onDelete,
   isLocked,
 }: Props<T>) {
+  const { t } = useTranslation();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<ReferenceValues>({});
   const [newValues, setNewValues] = useState(() => emptyValues(fields));
@@ -80,7 +82,7 @@ export default function ReferenceTable<T extends { id: string }>({
     await run(async () => {
       await onCreate(newValues);
       setNewValues(emptyValues(fields));
-    }, "Impossible d'ajouter l'élément.");
+    }, t("adminReference.addError"));
   }
 
   async function handleUpdate(e: FormEvent) {
@@ -89,13 +91,13 @@ export default function ReferenceTable<T extends { id: string }>({
     await run(async () => {
       await onUpdate(editingId, editValues);
       setEditingId(null);
-    }, "Impossible d'enregistrer les modifications.");
+    }, t("adminReference.saveError"));
   }
 
   async function handleDelete(item: T) {
     await run(async () => {
       await onDelete(item);
-    }, "Impossible de supprimer l'élément.");
+    }, t("adminReference.deleteError"));
   }
 
   function renderInput(
@@ -173,14 +175,14 @@ export default function ReferenceTable<T extends { id: string }>({
                           disabled={busy}
                           className={`${smallButton} border-indigo-600 bg-indigo-600 text-white`}
                         >
-                          Enregistrer
+                          {t("common.save")}
                         </button>
                         <button
                           type="button"
                           onClick={() => setEditingId(null)}
                           className={`${smallButton} border-gray-300`}
                         >
-                          Annuler
+                          {t("common.cancel")}
                         </button>
                       </div>
                     </td>
@@ -198,7 +200,7 @@ export default function ReferenceTable<T extends { id: string }>({
                   <td className="px-2 py-2">
                     {locked ? (
                       <span className="text-xs text-gray-500">
-                        Non modifiable
+                        {t("common.locked")}
                       </span>
                     ) : (
                       <div className="flex gap-1">
@@ -208,7 +210,7 @@ export default function ReferenceTable<T extends { id: string }>({
                           disabled={busy || editingId !== null}
                           className={`${smallButton} border-gray-300 hover:bg-gray-50`}
                         >
-                          Modifier
+                          {t("common.edit")}
                         </button>
                         <button
                           type="button"
@@ -216,7 +218,7 @@ export default function ReferenceTable<T extends { id: string }>({
                           disabled={busy || editingId !== null}
                           className={`${smallButton} border-red-300 text-red-700 hover:bg-red-50`}
                         >
-                          Supprimer
+                          {t("common.delete")}
                         </button>
                       </div>
                     )}
@@ -239,7 +241,7 @@ export default function ReferenceTable<T extends { id: string }>({
                   disabled={busy || editingId !== null}
                   className={`${smallButton} border-indigo-600 text-indigo-700 hover:bg-indigo-50`}
                 >
-                  Ajouter
+                  {t("common.add")}
                 </button>
               </td>
             </tr>

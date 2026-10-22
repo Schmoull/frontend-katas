@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import MainLayout from "../layouts/MainLayout";
 import StatusBadge from "../components/StatusBadge";
 import FavoriteButton from "../components/FavoriteButton";
@@ -17,19 +18,27 @@ import {
   formatDuration,
   formatParticipants,
 } from "../lib/format";
-import {
-  LOCATION_LABELS,
-  type Activity,
-  type ActivityStatus,
-  type LocationType,
-} from "../types";
+import { localizedName, type ContentLanguage } from "../i18n/languages";
+import type { Activity, ActivityStatus, LocationType } from "../types";
 
-function Section({ title, text }: { title: string; text: string | null }) {
+// Le contenu est dans la langue de l'activité : attribut lang pour les
+// lecteurs d'écran et la césure
+function Section({
+  title,
+  text,
+  lang,
+}: {
+  title: string;
+  text: string | null;
+  lang: string;
+}) {
   if (!text) return null;
   return (
     <div>
       <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-      <p className="mt-1 whitespace-pre-line text-gray-700">{text}</p>
+      <p className="mt-1 whitespace-pre-line text-gray-700" lang={lang}>
+        {text}
+      </p>
     </div>
   );
 }
@@ -38,6 +47,7 @@ const secondaryButton =
   "px-3 py-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50";
 
 export default function ActivityDetail() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
@@ -57,7 +67,7 @@ export default function ActivityDetail() {
       })
       .catch((e) => {
         console.error("Erreur chargement activité :", e);
-        if (!cancelled) setError("Impossible de charger l'activité.");
+        if (!cancelled) setError(t("common.loadActivityError"));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -67,7 +77,7 @@ export default function ActivityDetail() {
       cancelled = true;
     };
     // user?.id : une activité en brouillon devient visible après connexion
-  }, [id, user?.id]);
+  }, [id, user?.id, t]);
 
   async function changeStatus(status: ActivityStatus) {
     if (!activity) return;
@@ -76,7 +86,7 @@ export default function ActivityDetail() {
       await setActivityStatus(activity.id, status);
       setActivity(await getActivity(activity.id));
     } catch (e) {
-      alert(errorMessage(e, "Impossible de changer le statut."));
+      alert(errorMessage(e, t("detail.statusError")));
     } finally {
       setBusy(false);
     }
@@ -84,14 +94,14 @@ export default function ActivityDetail() {
 
   async function handleDelete() {
     if (!activity) return;
-    if (!confirm(`Supprimer définitivement « ${activity.title} » ?`)) return;
+    if (!confirm(t("detail.deleteConfirm", { title: activity.title }))) return;
     setBusy(true);
     try {
       await deleteActivity(activity.id);
       // Un administrateur peut supprimer l'activité d'un autre
       navigate(activity.created_by === user?.id ? "/mes-activites" : "/");
     } catch (e) {
-      alert(errorMessage(e, "Impossible de supprimer l'activité."));
+      alert(errorMessage(e, t("detail.deleteError")));
       setBusy(false);
     }
   }
@@ -99,7 +109,7 @@ export default function ActivityDetail() {
   if (loading) {
     return (
       <MainLayout>
-        <p className="text-gray-600">Chargement…</p>
+        <p className="text-gray-600">{t("common.loading")}</p>
       </MainLayout>
     );
   }
@@ -107,37 +117,45 @@ export default function ActivityDetail() {
   if (error || !activity) {
     return (
       <MainLayout>
-        <p className="text-red-600">{error ?? "Activité introuvable."}</p>
+        <p className="text-red-600">{error ?? t("common.activityNotFound")}</p>
         <Link
           to="/"
           className="mt-4 inline-block text-indigo-600 hover:underline"
         >
-          ← Retour au catalogue
+          {t("common.backToCatalog")}
         </Link>
       </MainLayout>
     );
   }
 
   const can = activityPermissions(activity, user?.id, profile?.role);
+  const lang = activity.language;
 
   const facts = [
-    { label: "Durée", value: formatDuration(activity.duration_minutes) },
     {
-      label: "Participants",
+      label: t("detail.duration"),
+      value: formatDuration(activity.duration_minutes),
+    },
+    {
+      label: t("detail.participants"),
       value: formatParticipants(
         activity.min_participants,
         activity.max_participants,
       ),
     },
     {
-      label: "Lieu",
+      label: t("detail.location"),
       value: activity.location_type
-        ? LOCATION_LABELS[activity.location_type as LocationType]
+        ? t(`locations.${activity.location_type as LocationType}`)
         : null,
     },
     {
-      label: "Tranches d'âge",
+      label: t("detail.ageBranches"),
       value: activity.age_branches.map(formatAgeBranch).join(", ") || null,
+    },
+    {
+      label: t("detail.language"),
+      value: t(`language.${lang as ContentLanguage}`),
     },
   ].filter((fact) => fact.value);
 
@@ -147,17 +165,23 @@ export default function ActivityDetail() {
         <header className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
-              {activity.activity_type?.name}
+              {activity.activity_type && localizedName(activity.activity_type)}
             </p>
             {activity.status !== "published" && (
               <StatusBadge status={activity.status} />
             )}
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">{activity.title}</h1>
+          <h1 className="text-3xl font-bold text-gray-900" lang={lang}>
+            {activity.title}
+          </h1>
           <p className="text-sm text-gray-500">
-            Par {activity.author?.display_name ?? "un·e auteur·rice inconnu·e"}
+            {t("common.by", {
+              name: activity.author?.display_name ?? t("common.unknownAuthor"),
+            })}
             {activity.published_at &&
-              ` · publiée le ${formatDate(activity.published_at)}`}
+              t("detail.publishedOn", {
+                date: formatDate(activity.published_at),
+              })}
           </p>
         </header>
 
@@ -168,7 +192,7 @@ export default function ActivityDetail() {
               to={`/activites/${activity.id}/modifier`}
               className="px-3 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
             >
-              Modifier
+              {t("common.edit")}
             </Link>
           )}
           {can.canPublish && (
@@ -177,7 +201,7 @@ export default function ActivityDetail() {
               onClick={() => changeStatus("published")}
               className={secondaryButton}
             >
-              Publier
+              {t("detail.publish")}
             </button>
           )}
           {can.canUnpublish && (
@@ -186,7 +210,7 @@ export default function ActivityDetail() {
               onClick={() => changeStatus("draft")}
               className={secondaryButton}
             >
-              Repasser en brouillon
+              {t("detail.unpublish")}
             </button>
           )}
           {can.canArchive && (
@@ -195,7 +219,7 @@ export default function ActivityDetail() {
               onClick={() => changeStatus("archived")}
               className={secondaryButton}
             >
-              Archiver
+              {t("detail.archive")}
             </button>
           )}
           {can.canDelete && (
@@ -204,7 +228,7 @@ export default function ActivityDetail() {
               onClick={handleDelete}
               className="px-3 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
             >
-              Supprimer
+              {t("common.delete")}
             </button>
           )}
         </div>
@@ -223,13 +247,13 @@ export default function ActivityDetail() {
         {activity.characteristic_forms.length > 0 && (
           <div className="rounded-xl bg-white p-4 shadow-sm">
             <h2 className="text-lg font-semibold text-gray-900">
-              Formes caractéristiques
+              {t("detail.characteristicForms")}
             </h2>
             <ul className="mt-2 space-y-1 text-gray-700">
               {activity.characteristic_forms.map((form) => (
                 <li key={form.id}>
                   <span className="font-semibold">{form.position}.</span>{" "}
-                  {form.name}
+                  {localizedName(form)}
                 </li>
               ))}
             </ul>
@@ -237,17 +261,35 @@ export default function ActivityDetail() {
         )}
 
         <div className="space-y-6 rounded-xl bg-white p-6 shadow-sm">
-          <Section title="Description" text={activity.description} />
           <Section
-            title="Objectif pédagogique"
-            text={activity.pedagogical_objective}
+            title={t("detail.description")}
+            text={activity.description}
+            lang={lang}
           />
-          <Section title="Matériel" text={activity.material_needed} />
-          <Section title="Sécurité" text={activity.safety_notes} />
-          <Section title="Thème narratif" text={activity.narrative_theme} />
           <Section
-            title="Adapter le thème"
+            title={t("detail.objective")}
+            text={activity.pedagogical_objective}
+            lang={lang}
+          />
+          <Section
+            title={t("detail.material")}
+            text={activity.material_needed}
+            lang={lang}
+          />
+          <Section
+            title={t("detail.safety")}
+            text={activity.safety_notes}
+            lang={lang}
+          />
+          <Section
+            title={t("detail.theme")}
+            text={activity.narrative_theme}
+            lang={lang}
+          />
+          <Section
+            title={t("detail.themeAdaptation")}
             text={activity.theme_adaptation_notes}
+            lang={lang}
           />
         </div>
       </article>

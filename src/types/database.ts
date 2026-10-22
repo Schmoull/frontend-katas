@@ -24,6 +24,7 @@ export type Database = {
           description: string | null;
           duration_minutes: number | null;
           id: string;
+          language: string;
           location_type: string | null;
           material_needed: string | null;
           max_participants: number | null;
@@ -44,6 +45,7 @@ export type Database = {
           description?: string | null;
           duration_minutes?: number | null;
           id?: string;
+          language?: string;
           location_type?: string | null;
           material_needed?: string | null;
           max_participants?: number | null;
@@ -64,6 +66,7 @@ export type Database = {
           description?: string | null;
           duration_minutes?: number | null;
           id?: string;
+          language?: string;
           location_type?: string | null;
           material_needed?: string | null;
           max_participants?: number | null;
@@ -157,21 +160,27 @@ export type Database = {
       activity_types: {
         Row: {
           description: string | null;
+          description_de: string | null;
           id: string;
           is_fallback: boolean;
           name: string;
+          name_de: string | null;
         };
         Insert: {
           description?: string | null;
+          description_de?: string | null;
           id?: string;
           is_fallback?: boolean;
           name: string;
+          name_de?: string | null;
         };
         Update: {
           description?: string | null;
+          description_de?: string | null;
           id?: string;
           is_fallback?: boolean;
           name?: string;
+          name_de?: string | null;
         };
         Relationships: [];
       };
@@ -181,18 +190,21 @@ export type Database = {
           max_age: number;
           min_age: number;
           name: string;
+          name_de: string | null;
         };
         Insert: {
           id?: string;
           max_age: number;
           min_age: number;
           name: string;
+          name_de?: string | null;
         };
         Update: {
           id?: string;
           max_age?: number;
           min_age?: number;
           name?: string;
+          name_de?: string | null;
         };
         Relationships: [];
       };
@@ -200,16 +212,19 @@ export type Database = {
         Row: {
           id: string;
           name: string;
+          name_de: string | null;
           position: number;
         };
         Insert: {
           id?: string;
           name: string;
+          name_de?: string | null;
           position: number;
         };
         Update: {
           id?: string;
           name?: string;
+          name_de?: string | null;
           position?: number;
         };
         Relationships: [];

@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import MainLayout from "../layouts/MainLayout";
-import ReferenceTable, {
-  type ReferenceValues,
-} from "../components/ReferenceTable";
+import ReferenceTable from "../components/ReferenceTable";
 import {
   countActivitiesOfAgeBranch,
   countActivitiesOfForm,
@@ -20,18 +19,17 @@ import {
   updateAgeBranch,
   updateCharacteristicForm,
 } from "../services/referenceService";
+import { localizedName } from "../i18n/languages";
 import type { ActivityType, AgeBranch, CharacteristicForm } from "../types";
 
-function plural(n: number, word: string) {
-  return `${n} ${word}${n > 1 ? "s" : ""}`;
-}
-
-// Champs de formulaire (chaînes) → valeurs pour la base
+// Champs de formulaire (chaînes) → valeurs pour la base. Une traduction
+// vide est enregistrée NULL : l'app retombe alors sur le français.
 const text = (v: string) => v.trim();
 const optionalText = (v: string) => v.trim() || null;
 const int = (v: string) => Number(v);
 
 export default function AdminReferenceData() {
+  const { t } = useTranslation();
   const [types, setTypes] = useState<ActivityType[]>([]);
   const [branches, setBranches] = useState<AgeBranch[]>([]);
   const [forms, setForms] = useState<CharacteristicForm[]>([]);
@@ -39,33 +37,34 @@ export default function AdminReferenceData() {
   const [error, setError] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
-    const [t, b, f] = await Promise.all([
+    const [typeRows, branchRows, formRows] = await Promise.all([
       listActivityTypes(),
       listAgeBranches(),
       listCharacteristicForms(),
     ]);
-    setTypes(t);
-    setBranches(b);
-    setForms(f);
+    setTypes(typeRows);
+    setBranches(branchRows);
+    setForms(formRows);
   }, []);
 
   useEffect(() => {
     reload()
       .catch((e) => {
         console.error("Erreur chargement des données de référence :", e);
-        setError("Impossible de charger les données de référence.");
+        setError(t("adminReference.loadError"));
       })
       .finally(() => setLoading(false));
-  }, [reload]);
+  }, [reload, t]);
 
   // ----- Types d'activité -----
 
   async function deleteType(type: ActivityType) {
     const count = await countActivitiesOfType(type.id);
+    const name = localizedName(type);
     const message =
       count > 0
-        ? `Supprimer le type « ${type.name} » ? ${plural(count, "activité")} passeront au type « Inconnu ».`
-        : `Supprimer le type « ${type.name} » ?`;
+        ? t("adminReference.deleteTypeUsed", { name, count })
+        : t("adminReference.deleteType", { name });
     if (!confirm(message)) return;
     await deleteActivityType(type.id);
     await reload();
@@ -75,10 +74,11 @@ export default function AdminReferenceData() {
 
   async function deleteBranch(branch: AgeBranch) {
     const count = await countActivitiesOfAgeBranch(branch.id);
+    const name = localizedName(branch);
     const message =
       count > 0
-        ? `Supprimer la tranche « ${branch.name} » ? Elle sera retirée de ${plural(count, "activité")}.`
-        : `Supprimer la tranche « ${branch.name} » ?`;
+        ? t("adminReference.deleteBranchUsed", { name, count })
+        : t("adminReference.deleteBranch", { name });
     if (!confirm(message)) return;
     await deleteAgeBranch(branch.id);
     await reload();
@@ -89,65 +89,80 @@ export default function AdminReferenceData() {
   async function deleteForm(form: CharacteristicForm) {
     const count = await countActivitiesOfForm(form.id);
     if (count > 0) {
-      alert(
-        `La forme ${form.position} est utilisée par ${plural(count, "activité")} : retire-la d'abord de ces activités, ou renomme-la plutôt que de la supprimer.`,
-      );
+      alert(t("adminReference.formUsed", { position: form.position, count }));
       return;
     }
-    if (!confirm(`Supprimer la forme ${form.position} « ${form.name} » ?`))
-      return;
+    const message = t("adminReference.deleteForm", {
+      position: form.position,
+      name: localizedName(form),
+    });
+    if (!confirm(message)) return;
     await deleteCharacteristicForm(form.id);
     await reload();
   }
 
   return (
     <MainLayout>
-      <section className="max-w-5xl space-y-6">
+      <section className="max-w-6xl space-y-6">
         <header>
           <h1 className="text-2xl font-bold text-gray-900">
-            Données de référence
+            {t("adminReference.title")}
           </h1>
           <p className="text-sm text-gray-600">
-            Les listes proposées dans le formulaire d'activité et les filtres du
-            catalogue.
+            {t("adminReference.subtitle")}
           </p>
         </header>
 
         {loading ? (
-          <p className="text-gray-600">Chargement…</p>
+          <p className="text-gray-600">{t("common.loading")}</p>
         ) : error ? (
           <p className="text-red-600">{error}</p>
         ) : (
           <>
             <ReferenceTable
-              title="Types d'activité"
-              help="Supprimer un type fait passer ses activités au type « Inconnu »."
+              title={t("adminReference.typesTitle")}
+              help={t("adminReference.typesHelp")}
               items={types}
               fields={[
                 {
                   key: "name",
-                  label: "Nom",
+                  label: t("adminReference.name"),
                   required: true,
-                  className: "w-1/3",
+                  className: "w-1/6",
                 },
-                { key: "description", label: "Description" },
+                {
+                  key: "name_de",
+                  label: t("adminReference.nameDe"),
+                  className: "w-1/6",
+                },
+                { key: "description", label: t("adminReference.description") },
+                {
+                  key: "description_de",
+                  label: t("adminReference.descriptionDe"),
+                },
               ]}
-              toValues={(t) => ({
-                name: t.name,
-                description: t.description ?? "",
+              toValues={(type) => ({
+                name: type.name,
+                name_de: type.name_de ?? "",
+                description: type.description ?? "",
+                description_de: type.description_de ?? "",
               })}
-              isLocked={(t) => t.is_fallback}
-              onCreate={async (v: ReferenceValues) => {
+              isLocked={(type) => type.is_fallback}
+              onCreate={async (v) => {
                 await createActivityType({
                   name: text(v.name),
+                  name_de: optionalText(v.name_de),
                   description: optionalText(v.description),
+                  description_de: optionalText(v.description_de),
                 });
                 await reload();
               }}
               onUpdate={async (id, v) => {
                 await updateActivityType(id, {
                   name: text(v.name),
+                  name_de: optionalText(v.name_de),
                   description: optionalText(v.description),
+                  description_de: optionalText(v.description_de),
                 });
                 await reload();
               }}
@@ -155,34 +170,41 @@ export default function AdminReferenceData() {
             />
 
             <ReferenceTable
-              title="Tranches d'âge"
-              help="Mettre 99 comme âge maximum pour « pas de limite ». Supprimer une tranche la retire des activités."
+              title={t("adminReference.agesTitle")}
+              help={t("adminReference.agesHelp")}
               items={branches}
               fields={[
-                { key: "name", label: "Nom", required: true },
+                {
+                  key: "name",
+                  label: t("adminReference.name"),
+                  required: true,
+                },
+                { key: "name_de", label: t("adminReference.nameDe") },
                 {
                   key: "min_age",
-                  label: "Âge min.",
+                  label: t("adminReference.minAge"),
                   type: "number",
                   required: true,
                   className: "w-28",
                 },
                 {
                   key: "max_age",
-                  label: "Âge max.",
+                  label: t("adminReference.maxAge"),
                   type: "number",
                   required: true,
                   className: "w-28",
                 },
               ]}
-              toValues={(b) => ({
-                name: b.name,
-                min_age: String(b.min_age),
-                max_age: String(b.max_age),
+              toValues={(branch) => ({
+                name: branch.name,
+                name_de: branch.name_de ?? "",
+                min_age: String(branch.min_age),
+                max_age: String(branch.max_age),
               })}
               onCreate={async (v) => {
                 await createAgeBranch({
                   name: text(v.name),
+                  name_de: optionalText(v.name_de),
                   min_age: int(v.min_age),
                   max_age: int(v.max_age),
                 });
@@ -191,6 +213,7 @@ export default function AdminReferenceData() {
               onUpdate={async (id, v) => {
                 await updateAgeBranch(id, {
                   name: text(v.name),
+                  name_de: optionalText(v.name_de),
                   min_age: int(v.min_age),
                   max_age: int(v.max_age),
                 });
@@ -200,24 +223,34 @@ export default function AdminReferenceData() {
             />
 
             <ReferenceTable
-              title="Formes caractéristiques (J+S)"
-              help="Une forme utilisée par des activités ne peut pas être supprimée."
+              title={t("adminReference.formsTitle")}
+              help={t("adminReference.formsHelp")}
               items={forms}
               fields={[
                 {
                   key: "position",
-                  label: "N°",
+                  label: t("adminReference.number"),
                   type: "number",
                   required: true,
                   className: "w-20",
                 },
-                { key: "name", label: "Intitulé", required: true },
+                {
+                  key: "name",
+                  label: t("adminReference.label"),
+                  required: true,
+                },
+                { key: "name_de", label: t("adminReference.labelDe") },
               ]}
-              toValues={(f) => ({ position: String(f.position), name: f.name })}
+              toValues={(form) => ({
+                position: String(form.position),
+                name: form.name,
+                name_de: form.name_de ?? "",
+              })}
               onCreate={async (v) => {
                 await createCharacteristicForm({
                   position: int(v.position),
                   name: text(v.name),
+                  name_de: optionalText(v.name_de),
                 });
                 await reload();
               }}
@@ -225,6 +258,7 @@ export default function AdminReferenceData() {
                 await updateCharacteristicForm(id, {
                   position: int(v.position),
                   name: text(v.name),
+                  name_de: optionalText(v.name_de),
                 });
                 await reload();
               }}

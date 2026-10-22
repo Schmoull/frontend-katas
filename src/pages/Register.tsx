@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Navigate, Link } from "react-router-dom";
+import { Trans, useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../contexts/useAuth";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 import type { FormEvent } from "react";
 
 export default function Register() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -34,7 +37,7 @@ export default function Register() {
 
     if (error) {
       console.error("Erreur register Supabase :", error);
-      setErrorMsg(error.message || "Inscription impossible.");
+      setErrorMsg(error.message || t("register.error"));
       return;
     }
 
@@ -48,14 +51,17 @@ export default function Register() {
       <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
         <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-md space-y-4">
           <h1 className="text-2xl font-bold text-gray-900">
-            Vérifie tes emails
+            {t("register.checkEmailTitle")}
           </h1>
           <p className="text-gray-600">
-            Un lien de confirmation a été envoyé à <strong>{email}</strong>.
-            Clique dessus pour activer ton compte, puis connecte-toi.
+            <Trans
+              i18nKey="register.checkEmailText"
+              values={{ email }}
+              components={{ strong: <strong /> }}
+            />
           </p>
           <Link to="/login" className="text-indigo-600 hover:underline">
-            Aller à la connexion
+            {t("register.goToLogin")}
           </Link>
         </div>
       </main>
@@ -65,9 +71,12 @@ export default function Register() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-gray-900">
-          Créer un compte
-        </h1>
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-bold text-gray-900">
+            {t("register.title")}
+          </h1>
+          <LanguageSwitcher />
+        </div>
 
         {errorMsg && <p className="mb-4 text-sm text-red-600">{errorMsg}</p>}
 
@@ -77,7 +86,7 @@ export default function Register() {
               className="block text-sm font-medium mb-1"
               htmlFor="display_name"
             >
-              Nom affiché
+              {t("common.displayName")}
             </label>
             <input
               id="display_name"
@@ -92,7 +101,7 @@ export default function Register() {
 
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="email">
-              Email
+              {t("common.email")}
             </label>
             <input
               id="email"
@@ -110,7 +119,7 @@ export default function Register() {
               className="block text-sm font-medium mb-1"
               htmlFor="password"
             >
-              Mot de passe
+              {t("common.password")}
             </label>
             <input
               id="password"
@@ -129,14 +138,14 @@ export default function Register() {
             disabled={loading}
             className="w-full py-2 rounded-md bg-indigo-600 text-white font-medium hover:bg-indigo-700 disabled:opacity-50"
           >
-            {loading ? "Création en cours..." : "S'inscrire"}
+            {loading ? t("register.submitting") : t("register.submit")}
           </button>
         </form>
 
         <p className="mt-4 text-sm text-gray-600">
-          Déjà un compte ?{" "}
+          {t("register.hasAccount")}{" "}
           <Link to="/login" className="text-indigo-600 hover:underline">
-            Se connecter
+            {t("register.login")}
           </Link>
         </p>
       </div>

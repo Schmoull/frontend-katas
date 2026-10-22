@@ -1,9 +1,12 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { Trans, useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabaseClient";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 export default function ForgotPassword() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -24,7 +27,7 @@ export default function ForgotPassword() {
 
     if (error) {
       console.error("Erreur reset password Supabase :", error);
-      setErrorMsg(error.message || "Envoi impossible.");
+      setErrorMsg(error.message || t("forgot.error"));
       return;
     }
 
@@ -34,22 +37,25 @@ export default function ForgotPassword() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-gray-900">
-          Mot de passe oublié
-        </h1>
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-bold text-gray-900">
+            {t("forgot.title")}
+          </h1>
+          <LanguageSwitcher />
+        </div>
 
         {sent ? (
           // Même message que le compte existe ou non (ne pas révéler les emails inscrits)
           <p className="text-gray-600">
-            Si un compte existe pour <strong>{email}</strong>, un lien pour
-            choisir un nouveau mot de passe vient d'y être envoyé.
+            <Trans
+              i18nKey="forgot.sent"
+              values={{ email }}
+              components={{ strong: <strong /> }}
+            />
           </p>
         ) : (
           <>
-            <p className="mb-4 text-sm text-gray-600">
-              Indique ton email : tu recevras un lien pour choisir un nouveau
-              mot de passe.
-            </p>
+            <p className="mb-4 text-sm text-gray-600">{t("forgot.intro")}</p>
 
             {errorMsg && (
               <p className="mb-4 text-sm text-red-600">{errorMsg}</p>
@@ -61,7 +67,7 @@ export default function ForgotPassword() {
                   className="block text-sm font-medium mb-1"
                   htmlFor="email"
                 >
-                  Email
+                  {t("common.email")}
                 </label>
                 <input
                   id="email"
@@ -79,7 +85,7 @@ export default function ForgotPassword() {
                 disabled={loading}
                 className="w-full py-2 rounded-md bg-indigo-600 text-white font-medium hover:bg-indigo-700 disabled:opacity-50"
               >
-                {loading ? "Envoi en cours..." : "Envoyer le lien"}
+                {loading ? t("forgot.submitting") : t("forgot.submit")}
               </button>
             </form>
           </>
@@ -87,7 +93,7 @@ export default function ForgotPassword() {
 
         <p className="mt-4 text-sm text-gray-600">
           <Link to="/login" className="text-indigo-600 hover:underline">
-            ← Retour à la connexion
+            {t("forgot.back")}
           </Link>
         </p>
       </div>

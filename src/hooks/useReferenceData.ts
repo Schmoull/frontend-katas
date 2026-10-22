@@ -1,5 +1,6 @@
 // src/hooks/useReferenceData.ts
 import { useEffect, useState } from "react";
+import i18n from "i18next";
 import {
   listActivityTypes,
   listAgeBranches,
@@ -34,8 +35,7 @@ export function useReferenceData() {
       })
       .catch((e) => {
         console.error("Erreur chargement des données de référence :", e);
-        if (!cancelled)
-          setError("Impossible de charger les données de référence.");
+        if (!cancelled) setError(i18n.t("adminReference.loadError"));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

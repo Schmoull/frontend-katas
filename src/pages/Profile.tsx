@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import MainLayout from "../layouts/MainLayout";
 import { useAuth } from "../contexts/useAuth";
 import { updateDisplayName } from "../services/profileService";
 import { errorMessage, formatDate } from "../lib/format";
-import { ROLE_LABELS, type Role } from "../types";
+import { ROLES, type Role } from "../types";
 
 export default function Profile() {
+  const { t } = useTranslation();
   const { user, profile, refreshProfile } = useAuth();
   const [displayName, setDisplayName] = useState(profile?.display_name ?? "");
   const [saving, setSaving] = useState(false);
@@ -30,21 +32,23 @@ export default function Profile() {
     try {
       await updateDisplayName(user.id, name);
       await refreshProfile();
-      setMessage({ type: "success", text: "Profil mis à jour." });
+      setMessage({ type: "success", text: t("profile.saved") });
     } catch (e) {
       setMessage({
         type: "error",
-        text: errorMessage(e, "Impossible de mettre à jour le profil."),
+        text: errorMessage(e, t("profile.error")),
       });
     } finally {
       setSaving(false);
     }
   }
 
+  const role = profile?.role as Role | undefined;
+
   return (
     <MainLayout>
       <section className="max-w-xl">
-        <h1 className="text-2xl font-bold mb-6">Profil</h1>
+        <h1 className="text-2xl font-bold mb-6">{t("profile.title")}</h1>
 
         <form
           onSubmit={handleSubmit}
@@ -55,7 +59,7 @@ export default function Profile() {
               className="block text-sm font-medium mb-1"
               htmlFor="display_name"
             >
-              Nom affiché
+              {t("common.displayName")}
             </label>
             <input
               id="display_name"
@@ -69,15 +73,15 @@ export default function Profile() {
 
           <dl className="grid gap-2 text-sm sm:grid-cols-2">
             <div>
-              <dt className="text-gray-500">Email</dt>
+              <dt className="text-gray-500">{t("common.email")}</dt>
               <dd>{user?.email}</dd>
             </div>
             <div>
-              <dt className="text-gray-500">Rôle</dt>
-              <dd>{profile ? ROLE_LABELS[profile.role as Role] : "—"}</dd>
+              <dt className="text-gray-500">{t("profile.role")}</dt>
+              <dd>{role && ROLES.includes(role) ? t(`roles.${role}`) : "—"}</dd>
             </div>
             <div>
-              <dt className="text-gray-500">Membre depuis</dt>
+              <dt className="text-gray-500">{t("profile.memberSince")}</dt>
               <dd>{formatDate(profile?.created_at ?? null) ?? "—"}</dd>
             </div>
           </dl>
@@ -97,7 +101,7 @@ export default function Profile() {
             disabled={saving}
             className="px-4 py-2 rounded-md bg-indigo-600 text-white font-medium hover:bg-indigo-700 disabled:opacity-50"
           >
-            {saving ? "Enregistrement…" : "Enregistrer"}
+            {saving ? t("common.saving") : t("common.save")}
           </button>
         </form>
       </section>
