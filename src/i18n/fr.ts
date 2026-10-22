@@ -1,4 +1,4 @@
-// Textes de l'interface en français : la référence. de.ts doit avoir
+// Textes de l'interface en français : la référence. de.ts et it.ts doivent avoir
 // exactement les mêmes clés (vérifié à la compilation).
 // Pluriels i18next : suffixes _one / _other, choisis selon {{count}}.
 export const fr = {
@@ -216,7 +216,7 @@ export const fr = {
   adminReference: {
     title: "Données de référence",
     subtitle:
-      "Les listes proposées dans le formulaire d'activité et les filtres du catalogue. Un nom allemand vide est remplacé par le nom français.",
+      "Les listes proposées dans le formulaire d'activité et les filtres du catalogue. Un nom allemand ou italien vide est remplacé par le nom français.",
     loadError: "Impossible de charger les données de référence.",
     typesTitle: "Types d'activité",
     typesHelp:
@@ -229,13 +229,16 @@ export const fr = {
       "Une forme utilisée par des activités ne peut pas être supprimée.",
     name: "Nom",
     nameDe: "Nom (allemand)",
+    nameIt: "Nom (italien)",
     description: "Description",
     descriptionDe: "Description (allemand)",
+    descriptionIt: "Description (italien)",
     minAge: "Âge min.",
     maxAge: "Âge max.",
     number: "N°",
     label: "Intitulé",
     labelDe: "Intitulé (allemand)",
+    labelIt: "Intitulé (italien)",
     deleteType: "Supprimer le type « {{name}} » ?",
     deleteTypeUsed_one:
       "Supprimer le type « {{name}} » ? {{count}} activité passera au type « Inconnu ».",

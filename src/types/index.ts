@@ -37,7 +37,10 @@ export type UserAccount = {
 
 // Activité avec ses relations, telle que renvoyée par activitiesService
 export type Activity = ActivityRow & {
-  activity_type: Pick<ActivityType, "id" | "name" | "name_de"> | null;
+  activity_type: Pick<
+    ActivityType,
+    "id" | "name" | "name_de" | "name_it"
+  > | null;
   age_branches: AgeBranch[];
   characteristic_forms: CharacteristicForm[];
   author: Pick<Profile, "id" | "display_name"> | null;

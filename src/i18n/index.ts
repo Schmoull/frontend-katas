@@ -5,13 +5,18 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
 import { fr } from "./fr";
 import { de } from "./de";
+import { it } from "./it";
 import { UI_LANGUAGES } from "./languages";
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources: { fr: { translation: fr }, de: { translation: de } },
+    resources: {
+      fr: { translation: fr },
+      de: { translation: de },
+      it: { translation: it },
+    },
     supportedLngs: [...UI_LANGUAGES],
     // « de-CH », « fr-CH »… → « de », « fr »
     nonExplicitSupportedLngs: true,

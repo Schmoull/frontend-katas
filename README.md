@@ -11,7 +11,7 @@ des consignes de sécurité et un thème narratif.
   - **Modérateur** : modifie et archive les activités des autres (hors brouillons).
   - **Administrateur** : voit et supprime tout, change le rôle des utilisateurs.
 - Les administrateurs gèrent les types d'activité, tranches d'âge et formes caractéristiques J+S depuis la page « Données de référence ».
-- Interface en français et en allemand (`src/i18n/fr.ts` est la référence, `de.ts` doit avoir les mêmes clés). Chaque activité est écrite dans une langue (FR, DE ou IT) ; le catalogue montre par défaut celles de la langue de l'interface.
+- Interface en français, allemand et italien (`src/i18n/fr.ts` est la référence, `de.ts` et `it.ts` doivent avoir les mêmes clés). Chaque activité est écrite dans une langue (FR, DE ou IT) ; le catalogue montre par défaut celles de la langue de l'interface.
 
 ## Structure
 

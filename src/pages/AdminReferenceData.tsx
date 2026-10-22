@@ -135,25 +135,38 @@ export default function AdminReferenceData() {
                   label: t("adminReference.nameDe"),
                   className: "w-1/6",
                 },
+                {
+                  key: "name_it",
+                  label: t("adminReference.nameIt"),
+                  className: "w-1/6",
+                },
                 { key: "description", label: t("adminReference.description") },
                 {
                   key: "description_de",
                   label: t("adminReference.descriptionDe"),
                 },
+                {
+                  key: "description_it",
+                  label: t("adminReference.descriptionIt"),
+                },
               ]}
               toValues={(type) => ({
                 name: type.name,
                 name_de: type.name_de ?? "",
+                name_it: type.name_it ?? "",
                 description: type.description ?? "",
                 description_de: type.description_de ?? "",
+                description_it: type.description_it ?? "",
               })}
               isLocked={(type) => type.is_fallback}
               onCreate={async (v) => {
                 await createActivityType({
                   name: text(v.name),
                   name_de: optionalText(v.name_de),
+                  name_it: optionalText(v.name_it),
                   description: optionalText(v.description),
                   description_de: optionalText(v.description_de),
+                  description_it: optionalText(v.description_it),
                 });
                 await reload();
               }}
@@ -161,8 +174,10 @@ export default function AdminReferenceData() {
                 await updateActivityType(id, {
                   name: text(v.name),
                   name_de: optionalText(v.name_de),
+                  name_it: optionalText(v.name_it),
                   description: optionalText(v.description),
                   description_de: optionalText(v.description_de),
+                  description_it: optionalText(v.description_it),
                 });
                 await reload();
               }}
@@ -180,6 +195,7 @@ export default function AdminReferenceData() {
                   required: true,
                 },
                 { key: "name_de", label: t("adminReference.nameDe") },
+                { key: "name_it", label: t("adminReference.nameIt") },
                 {
                   key: "min_age",
                   label: t("adminReference.minAge"),
@@ -198,6 +214,7 @@ export default function AdminReferenceData() {
               toValues={(branch) => ({
                 name: branch.name,
                 name_de: branch.name_de ?? "",
+                name_it: branch.name_it ?? "",
                 min_age: String(branch.min_age),
                 max_age: String(branch.max_age),
               })}
@@ -205,6 +222,7 @@ export default function AdminReferenceData() {
                 await createAgeBranch({
                   name: text(v.name),
                   name_de: optionalText(v.name_de),
+                  name_it: optionalText(v.name_it),
                   min_age: int(v.min_age),
                   max_age: int(v.max_age),
                 });
@@ -214,6 +232,7 @@ export default function AdminReferenceData() {
                 await updateAgeBranch(id, {
                   name: text(v.name),
                   name_de: optionalText(v.name_de),
+                  name_it: optionalText(v.name_it),
                   min_age: int(v.min_age),
                   max_age: int(v.max_age),
                 });
@@ -240,17 +259,20 @@ export default function AdminReferenceData() {
                   required: true,
                 },
                 { key: "name_de", label: t("adminReference.labelDe") },
+                { key: "name_it", label: t("adminReference.labelIt") },
               ]}
               toValues={(form) => ({
                 position: String(form.position),
                 name: form.name,
                 name_de: form.name_de ?? "",
+                name_it: form.name_it ?? "",
               })}
               onCreate={async (v) => {
                 await createCharacteristicForm({
                   position: int(v.position),
                   name: text(v.name),
                   name_de: optionalText(v.name_de),
+                  name_it: optionalText(v.name_it),
                 });
                 await reload();
               }}
@@ -259,6 +281,7 @@ export default function AdminReferenceData() {
                   position: int(v.position),
                   name: text(v.name),
                   name_de: optionalText(v.name_de),
+                  name_it: optionalText(v.name_it),
                 });
                 await reload();
               }}

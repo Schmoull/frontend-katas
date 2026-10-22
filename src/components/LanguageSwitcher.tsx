@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { UI_LANGUAGES, currentLanguage } from "../i18n/languages";
 
-// Boutons FR / DE ; le choix est mémorisé par le détecteur (localStorage)
+// Boutons FR / DE / IT ; le choix est mémorisé par le détecteur (localStorage)
 export default function LanguageSwitcher() {
   const { t, i18n } = useTranslation();
   const active = currentLanguage();

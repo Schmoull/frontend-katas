@@ -13,9 +13,9 @@ import type { ContentLanguage } from "../i18n/languages";
 // relie aussi activities à profiles, PostgREST refuse sinon (PGRST201).
 export const ACTIVITY_SELECT = `
   *,
-  activity_type:activity_types(id, name, name_de),
-  age_branches(id, name, name_de, min_age, max_age),
-  characteristic_forms(id, position, name, name_de),
+  activity_type:activity_types(id, name, name_de, name_it),
+  age_branches(id, name, name_de, name_it, min_age, max_age),
+  characteristic_forms(id, position, name, name_de, name_it),
   author:profiles!activities_created_by_fkey(id, display_name)
 `;
 

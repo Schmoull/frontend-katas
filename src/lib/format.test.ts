@@ -53,6 +53,7 @@ describe("formatAgeBranch", () => {
   const branch = {
     name: "Louveteaux",
     name_de: "Wölfe",
+    name_it: "Lupetti",
     min_age: 6,
     max_age: 10,
   };
@@ -66,6 +67,7 @@ describe("formatAgeBranch", () => {
       formatAgeBranch({
         name: "Routiers",
         name_de: "Rover",
+        name_it: "Rover",
         min_age: 17,
         max_age: 99,
       }),
@@ -77,6 +79,14 @@ describe("formatAgeBranch", () => {
     expect(formatAgeBranch(branch)).toBe("Wölfe (6–10 Jahre)");
     expect(formatAgeBranch({ ...branch, name_de: null })).toBe(
       "Louveteaux (6–10 Jahre)",
+    );
+  });
+
+  it("utilise le nom italien, ou le français s'il manque", async () => {
+    await i18n.changeLanguage("it");
+    expect(formatAgeBranch(branch)).toBe("Lupetti (6–10 anni)");
+    expect(formatAgeBranch({ ...branch, name_it: null })).toBe(
+      "Louveteaux (6–10 anni)",
     );
   });
 });

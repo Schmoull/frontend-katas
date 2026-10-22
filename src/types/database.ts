@@ -161,26 +161,32 @@ export type Database = {
         Row: {
           description: string | null;
           description_de: string | null;
+          description_it: string | null;
           id: string;
           is_fallback: boolean;
           name: string;
           name_de: string | null;
+          name_it: string | null;
         };
         Insert: {
           description?: string | null;
           description_de?: string | null;
+          description_it?: string | null;
           id?: string;
           is_fallback?: boolean;
           name: string;
           name_de?: string | null;
+          name_it?: string | null;
         };
         Update: {
           description?: string | null;
           description_de?: string | null;
+          description_it?: string | null;
           id?: string;
           is_fallback?: boolean;
           name?: string;
           name_de?: string | null;
+          name_it?: string | null;
         };
         Relationships: [];
       };
@@ -191,6 +197,7 @@ export type Database = {
           min_age: number;
           name: string;
           name_de: string | null;
+          name_it: string | null;
         };
         Insert: {
           id?: string;
@@ -198,6 +205,7 @@ export type Database = {
           min_age: number;
           name: string;
           name_de?: string | null;
+          name_it?: string | null;
         };
         Update: {
           id?: string;
@@ -205,6 +213,7 @@ export type Database = {
           min_age?: number;
           name?: string;
           name_de?: string | null;
+          name_it?: string | null;
         };
         Relationships: [];
       };
@@ -213,18 +222,21 @@ export type Database = {
           id: string;
           name: string;
           name_de: string | null;
+          name_it: string | null;
           position: number;
         };
         Insert: {
           id?: string;
           name: string;
           name_de?: string | null;
+          name_it?: string | null;
           position: number;
         };
         Update: {
           id?: string;
           name?: string;
           name_de?: string | null;
+          name_it?: string | null;
           position?: number;
         };
         Relationships: [];

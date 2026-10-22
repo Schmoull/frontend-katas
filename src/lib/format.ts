@@ -36,7 +36,10 @@ export function formatParticipants(
 const NO_MAX_AGE = 99;
 
 export function formatAgeBranch(
-  branch: Pick<AgeBranch, "name" | "name_de" | "min_age" | "max_age">,
+  branch: Pick<
+    AgeBranch,
+    "name" | "name_de" | "name_it" | "min_age" | "max_age"
+  >,
 ): string {
   const name = localizedName(branch);
   if (branch.max_age >= NO_MAX_AGE)

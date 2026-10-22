@@ -214,7 +214,7 @@ export const de: Translation = {
   adminReference: {
     title: "Stammdaten",
     subtitle:
-      "Die Listen im Aktivitätsformular und in den Katalogfiltern. Ist der deutsche Name leer, wird der französische angezeigt.",
+      "Die Listen im Aktivitätsformular und in den Katalogfiltern. Ist der deutsche oder italienische Name leer, wird der französische angezeigt.",
     loadError: "Die Stammdaten konnten nicht geladen werden.",
     typesTitle: "Aktivitätstypen",
     typesHelp:
@@ -227,13 +227,16 @@ export const de: Translation = {
       "Eine Form, die von Aktivitäten verwendet wird, kann nicht gelöscht werden.",
     name: "Name (Französisch)",
     nameDe: "Name (Deutsch)",
+    nameIt: "Name (Italienisch)",
     description: "Beschreibung (Französisch)",
     descriptionDe: "Beschreibung (Deutsch)",
+    descriptionIt: "Beschreibung (Italienisch)",
     minAge: "Alter min.",
     maxAge: "Alter max.",
     number: "Nr.",
     label: "Bezeichnung (Französisch)",
     labelDe: "Bezeichnung (Deutsch)",
+    labelIt: "Bezeichnung (Italienisch)",
     deleteType: "Typ «{{name}}» löschen?",
     deleteTypeUsed_one:
       "Typ «{{name}}» löschen? {{count}} Aktivität erhält den Typ «Unbekannt».",
