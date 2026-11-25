@@ -1,0 +1,95 @@
+/*
+ * Composants réutilisables construits sur les jetons de tokens.css.
+ * Ils restent combinables avec des utilitaires Tailwind (ex. "btn btn-primary w-full").
+ */
+
+@layer components {
+  /* ---------- Boutons ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-control);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition:
+      background-color 150ms,
+      color 150ms,
+      border-color 150ms;
+    cursor: pointer;
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background-color: var(--color-primary-600);
+    color: #fff;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-700);
+  }
+
+  .btn-secondary {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    border: 1px solid var(--color-line);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background-color: var(--color-neutral-50);
+  }
+
+  .btn-danger {
+    background-color: var(--color-danger-600);
+    color: #fff;
+  }
+  .btn-danger:hover:not(:disabled) {
+    background-color: var(--color-danger-700);
+  }
+
+  /* ---------- Champs de formulaire ---------- */
+  .input {
+    display: block;
+    width: 100%;
+    border-radius: var(--radius-control);
+    border: 1px solid var(--color-line);
+    background-color: var(--color-surface);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-ink);
+  }
+  .input:focus {
+    border-color: var(--color-primary-500);
+    outline: none;
+    box-shadow: 0 0 0 1px var(--color-primary-500);
+  }
+
+  .label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-neutral-700);
+  }
+
+  /* ---------- Cartes ---------- */
+  .card {
+    border-radius: var(--radius-card);
+    background-color: var(--color-surface);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ---------- Badges ---------- */
+  .badge {
+    display: inline-block;
+    border-radius: 9999px;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+}

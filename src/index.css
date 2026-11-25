@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+/* Charte graphique : jetons → base → composants */
+@import "./styles/tokens.css";
+@import "./styles/base.css";
+@import "./styles/components.css";

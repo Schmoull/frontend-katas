@@ -1,0 +1,30 @@
+/* Styles de base : appliqués aux éléments HTML, sans classe. */
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background-color: var(--color-background);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    color: var(--color-ink);
+  }
+
+  a {
+    color: var(--color-primary-600);
+  }
+
+  a:hover {
+    color: var(--color-primary-700);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
+}
