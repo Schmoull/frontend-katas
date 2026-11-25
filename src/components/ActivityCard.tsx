@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import StatusBadge from "./StatusBadge";
+import { activityTypeStyle } from "../lib/activityTypeStyle";
 import { formatDuration, formatParticipants } from "../lib/format";
 import {
   currentLanguage,
@@ -16,16 +17,16 @@ type ActivityCardProps = {
   showAuthor?: boolean;
 };
 
-function truncate(text: string, max: number) {
-  return text.length > max ? text.slice(0, max) + "…" : text;
-}
-
 export default function ActivityCard({
   activity,
   showStatus = false,
   showAuthor = false,
 }: ActivityCardProps) {
   const { t } = useTranslation();
+  const typeStyle = activityTypeStyle(activity.activity_type?.name);
+  const forms = activity.characteristic_forms;
+
+  // Données absentes : la puce est simplement omise
   const details = [
     formatDuration(activity.duration_minutes),
     formatParticipants(activity.min_participants, activity.max_participants),
@@ -35,86 +36,103 @@ export default function ActivityCard({
   ].filter(Boolean);
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-xl border bg-white text-gray-900 shadow-sm transition hover:shadow-md">
-      <div className="flex flex-1 flex-col p-4">
-        <div className="flex items-start justify-between gap-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
-            {activity.activity_type && localizedName(activity.activity_type)}
-          </p>
-          <div className="flex gap-1">
+    <article className="fiche">
+      <div className={`fiche-tete ${typeStyle.className}`}>
+        <span className="etiquette-type">
+          {typeStyle.pictogram && <img src={typeStyle.pictogram} alt="" />}
+          {activity.activity_type && localizedName(activity.activity_type)}
+        </span>
+
+        {forms.length > 0 && (
+          // Intitulés trop longs pour la fiche : numéros + intitulés au survol
+          <span
+            className="badge-js shrink-0"
+            title={`${t("card.formsLabel")} : ${forms
+              .map((form) => `${form.position}. ${localizedName(form)}`)
+              .join(" ; ")}`}
+          >
+            <span>
+              J+S ·{" "}
+              {forms
+                .map((form) => t("card.formBadge", { position: form.position }))
+                .join(", ")}
+            </span>
+          </span>
+        )}
+      </div>
+
+      <div className="fiche-corps">
+        {(showStatus || activity.language !== currentLanguage()) && (
+          <div className="flex flex-wrap gap-2">
             {/* Langue du contenu, signalée si ce n'est pas celle de l'interface */}
             {activity.language !== currentLanguage() && (
               <span
                 lang={activity.language}
                 title={t(`language.${activity.language as ContentLanguage}`)}
-                className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold uppercase text-gray-700"
+                className="inline-flex h-7 items-center border-2 border-encre px-2 font-titre text-sm font-bold uppercase tracking-wider"
               >
                 {activity.language}
               </span>
             )}
             {showStatus && <StatusBadge status={activity.status} />}
           </div>
-        </div>
+        )}
 
-        <h3 className="mt-1 text-lg font-semibold" lang={activity.language}>
+        <h3 className="fiche-titre" lang={activity.language}>
           {activity.title}
         </h3>
 
         {showAuthor && activity.author && (
-          <p className="text-xs text-gray-500">
+          <p className="legende -mt-1 text-encre-discrete">
             {t("common.by", { name: activity.author.display_name })}
           </p>
         )}
 
         {details.length > 0 && (
-          <p className="mt-1 text-sm text-gray-600">{details.join(" · ")}</p>
-        )}
-
-        {activity.description && (
-          <p className="mt-2 text-sm text-gray-600" lang={activity.language}>
-            {truncate(activity.description, 120)}
-          </p>
-        )}
-
-        {activity.characteristic_forms.length > 0 && (
-          // Intitulés trop longs pour la carte : numéro + intitulé au survol
-          <ul
-            className="mt-3 flex flex-wrap gap-1"
-            aria-label={t("card.formsLabel")}
-          >
-            {activity.characteristic_forms.map((form) => (
-              <li
-                key={form.id}
-                title={localizedName(form)}
-                className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700"
-              >
-                {t("card.formBadge", { position: form.position })}
+          <ul className="flex flex-wrap gap-1.5">
+            {details.map((detail) => (
+              <li key={detail} className="puce-donnee">
+                {detail}
               </li>
             ))}
           </ul>
         )}
 
+        {activity.description && (
+          <p className="fiche-resume" lang={activity.language}>
+            {activity.description}
+          </p>
+        )}
+
         {activity.age_branches.length > 0 && (
-          <ul className="mt-2 flex flex-wrap gap-1">
+          <ul className="flex flex-wrap gap-1.5">
             {activity.age_branches.map((branch) => (
-              <li
-                key={branch.id}
-                className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs text-indigo-700"
-              >
+              <li key={branch.id} className="pastille-branche">
                 {localizedName(branch)}
               </li>
             ))}
           </ul>
         )}
+      </div>
 
-        <div className="mt-auto pt-4">
-          <Link
-            to={`/activites/${activity.id}`}
-            className="inline-block px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+      <div className="fiche-pied">
+        <Link
+          to={`/activites/${activity.id}`}
+          className="btn btn-secondaire h-11 flex-1 justify-between"
+        >
+          {t("card.view")}
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
           >
-            {t("card.view")}
-          </Link>
-        </div>
+            <path d="M4 12h16M14 6l6 6-6 6" />
+          </svg>
+        </Link>
       </div>
     </article>
   );

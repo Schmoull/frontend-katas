@@ -82,6 +82,13 @@
     padding: 0;
   }
 
+  /* Petit bouton : en-tête, barres d'outils */
+  .btn-petit {
+    height: 2.25rem;
+    padding: 0 0.875rem;
+    font-size: 1rem;
+  }
+
   /* ======================= Champs ======================= */
   .libelle {
     display: block;
@@ -322,6 +329,44 @@
   /* Bouton favori : contour, rempli en signal quand actif */
   .btn-favori[aria-pressed="true"] {
     background-color: var(--color-signal);
+  }
+
+  /* ======================= En-tête ======================= */
+  .entete {
+    background-color: var(--color-papier-clair);
+    box-shadow: var(--shadow-posee);
+  }
+
+  /* Lien de navigation : actif souligné en signal (aria-current="page") */
+  .nav-lien {
+    display: inline-flex;
+    align-items: center;
+    height: 2.75rem;
+    padding: 0 0.625rem;
+    font-family: var(--font-titre);
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-encre-douce);
+    text-decoration: none;
+  }
+  .nav-lien:hover {
+    color: var(--color-encre);
+  }
+  .nav-lien[aria-current="page"] {
+    color: var(--color-encre);
+    text-decoration: underline;
+    text-decoration-color: var(--color-signal);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 6px;
+  }
+
+  /* Zone en retrait (barre de filtres) */
+  .zone-filtres {
+    background-color: var(--color-papier-fonce);
+    padding: 1rem;
   }
 
   /* ======================= Bandeaux ======================= */

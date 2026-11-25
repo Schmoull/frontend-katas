@@ -7,11 +7,7 @@ export default function LanguageSwitcher() {
   const active = currentLanguage();
 
   return (
-    <div
-      role="group"
-      aria-label={t("language.label")}
-      className="flex justify-center gap-1"
-    >
+    <div role="group" aria-label={t("language.label")} className="flex">
       {UI_LANGUAGES.map((lang) => (
         <button
           key={lang}
@@ -19,10 +15,10 @@ export default function LanguageSwitcher() {
           lang={lang}
           aria-pressed={active === lang}
           onClick={() => i18n.changeLanguage(lang)}
-          className={`px-3 py-1 rounded-md text-sm font-semibold uppercase ${
+          className={`h-9 min-w-9 px-2 font-titre text-base font-bold uppercase tracking-wider ${
             active === lang
-              ? "bg-indigo-600 text-white"
-              : "text-gray-600 hover:bg-indigo-100"
+              ? "bg-encre text-papier"
+              : "text-encre-douce hover:bg-papier-fonce hover:text-encre"
           }`}
         >
           {lang}

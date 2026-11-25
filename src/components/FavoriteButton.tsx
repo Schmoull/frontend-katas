@@ -44,15 +44,22 @@ export default function FavoriteButton({ activityId }: { activityId: string }) {
 
   return (
     <button
+      type="button"
       onClick={toggle}
       disabled={busy || favorite === null}
       aria-pressed={favorite ?? false}
-      className={`px-3 py-2 rounded-md border disabled:opacity-50 ${
-        favorite
-          ? "border-amber-400 bg-amber-50 text-amber-800 hover:bg-amber-100"
-          : "border-gray-300 bg-white hover:bg-gray-50"
-      }`}
+      className="btn btn-contour btn-favori"
     >
+      <svg
+        viewBox="0 0 24 24"
+        fill={favorite ? "currentColor" : "none"}
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 20s-7.5-4.4-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.6-7.5 10-7.5 10z" />
+      </svg>
       {favorite ? t("favorite.remove") : t("favorite.add")}
     </button>
   );

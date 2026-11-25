@@ -5,16 +5,11 @@ import LogoutButton from "../components/LogoutButton";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import { useAuth } from "../contexts/useAuth";
 import { ROLES, type Role } from "../types";
+import logo from "../assets/scoutoria/scoutoria-logo.svg";
 
 type MainLayoutProps = {
   children: ReactNode;
 };
-
-function navLinkClass({ isActive }: { isActive: boolean }) {
-  return `block px-3 py-2 rounded-md font-medium ${
-    isActive ? "bg-indigo-600 text-white" : "hover:bg-indigo-100 text-gray-800"
-  }`;
-}
 
 function getInitials(name: string) {
   return name
@@ -34,90 +29,99 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const roleLabel = role && ROLES.includes(role) ? t(`roles.${role}`) : null;
 
   return (
-    <div className="min-h-screen md:flex bg-gray-100 text-gray-900">
-      {/* ----- Barre latérale ----- */}
-      <aside className="md:w-64 bg-white border-b md:border-b-0 md:border-r shadow-sm p-6 flex flex-col justify-between gap-6">
-        <div>
-          {user ? (
-            <div className="text-center mb-8">
-              <div className="mx-auto size-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xl font-bold">
-                {getInitials(displayName)}
-              </div>
-              <p className="mt-2 font-semibold break-words">{displayName}</p>
-              {roleLabel && (
-                <p className="text-sm text-gray-500">{roleLabel}</p>
+    <div className="min-h-screen bg-papier text-encre">
+      <header className="entete">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 pt-4 md:px-8">
+          <Link to="/" className="shrink-0">
+            <img
+              src={logo}
+              alt={t("app.name")}
+              className="h-10 w-auto md:h-12"
+            />
+          </Link>
+
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            {user ? (
+              <>
+                <Link
+                  to="/profil"
+                  className="flex items-center gap-2 no-underline"
+                  title={t("nav.profile")}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="flex size-9 items-center justify-center bg-encre font-titre text-base font-bold text-papier"
+                  >
+                    {getInitials(displayName)}
+                  </span>
+                  <span className="hidden flex-col leading-tight lg:flex">
+                    <span className="corps-fort text-sm">{displayName}</span>
+                    {roleLabel && (
+                      <span className="legende text-encre-discrete">
+                        {roleLabel}
+                      </span>
+                    )}
+                  </span>
+                  <span className="sr-only">{t("nav.profile")}</span>
+                </Link>
+                <LogoutButton />
+              </>
+            ) : (
+              <Link to="/login" className="btn btn-secondaire btn-petit">
+                {t("nav.login")}
+              </Link>
+            )}
+          </div>
+
+          {/* Défile horizontalement sur petit écran */}
+          <nav className="-mx-4 w-full overflow-x-auto px-2 md:mx-0 md:px-0">
+            <div className="flex gap-1 pb-1">
+              <NavLink to="/" end className="nav-lien">
+                {t("nav.catalog")}
+              </NavLink>
+
+              {user && (
+                <NavLink to="/favoris" className="nav-lien">
+                  {t("nav.favorites")}
+                </NavLink>
+              )}
+
+              {hasRole("contributeur") && (
+                <>
+                  <NavLink to="/mes-activites" className="nav-lien">
+                    {t("nav.myActivities")}
+                  </NavLink>
+                  <NavLink to="/activites/nouvelle" className="nav-lien">
+                    {t("nav.newActivity")}
+                  </NavLink>
+                </>
+              )}
+
+              {hasRole("moderateur") && (
+                <NavLink to="/archives" className="nav-lien">
+                  {t("nav.archives")}
+                </NavLink>
+              )}
+
+              {hasRole("administrateur") && (
+                <>
+                  <NavLink to="/admin/utilisateurs" className="nav-lien">
+                    {t("nav.users")}
+                  </NavLink>
+                  <NavLink to="/admin/referentiel" className="nav-lien">
+                    {t("nav.referenceData")}
+                  </NavLink>
+                </>
               )}
             </div>
-          ) : (
-            <p className="mb-8 text-center text-lg font-bold text-indigo-600">
-              {t("app.name")}
-            </p>
-          )}
-
-          <nav className="space-y-2">
-            <NavLink to="/" end className={navLinkClass}>
-              {t("nav.catalog")}
-            </NavLink>
-
-            {user && (
-              <NavLink to="/favoris" className={navLinkClass}>
-                {t("nav.favorites")}
-              </NavLink>
-            )}
-
-            {hasRole("contributeur") && (
-              <>
-                <NavLink to="/mes-activites" className={navLinkClass}>
-                  {t("nav.myActivities")}
-                </NavLink>
-                <NavLink to="/activites/nouvelle" className={navLinkClass}>
-                  {t("nav.newActivity")}
-                </NavLink>
-              </>
-            )}
-
-            {hasRole("moderateur") && (
-              <NavLink to="/archives" className={navLinkClass}>
-                {t("nav.archives")}
-              </NavLink>
-            )}
-
-            {hasRole("administrateur") && (
-              <>
-                <NavLink to="/admin/utilisateurs" className={navLinkClass}>
-                  {t("nav.users")}
-                </NavLink>
-                <NavLink to="/admin/referentiel" className={navLinkClass}>
-                  {t("nav.referenceData")}
-                </NavLink>
-              </>
-            )}
-
-            {user && (
-              <NavLink to="/profil" className={navLinkClass}>
-                {t("nav.profile")}
-              </NavLink>
-            )}
           </nav>
         </div>
+      </header>
 
-        <div className="space-y-4">
-          <LanguageSwitcher />
-          {user ? (
-            <LogoutButton />
-          ) : (
-            <Link
-              to="/login"
-              className="block text-center bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition font-semibold"
-            >
-              {t("nav.login")}
-            </Link>
-          )}
-        </div>
-      </aside>
-
-      {/* ----- Zone de contenu principale ----- */}
-      <section className="flex-1 p-4 md:p-8">{children}</section>
+      <main className="mx-auto max-w-7xl px-4 py-6 md:px-8 md:py-8">
+        {children}
+      </main>
     </div>
   );
 }

@@ -88,7 +88,8 @@ La table `activity_types` a 9 types, la charte en prévoit 7 :
 
 ## Reste à faire
 
-- [ ] Migrer les composants et pages existants vers ces classes (ils utilisent
-      encore `indigo`, `gray`, `rounded-md`…).
+- [x] Lot 1 : en-tête (`MainLayout`), catalogue, fiche d'activité, favori,
+      statut, langue, déconnexion.
+- [ ] Lot 2 : détail et formulaire d'une activité.
+- [ ] Lot 3 : connexion, profil, administration, listes.
 - [ ] Définir couleur et pictogramme pour Réflexion et Service.
-- [ ] Ajouter le logo dans l'en-tête (`MainLayout`).

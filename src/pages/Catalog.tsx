@@ -12,7 +12,7 @@ import {
 } from "../i18n/languages";
 import { LOCATION_TYPES, type Activity, type LocationType } from "../types";
 
-const selectClass = "w-full border border-gray-300 rounded-md p-2 bg-white";
+const selectClass = "champ";
 
 export default function Catalog() {
   const { t, i18n } = useTranslation();
@@ -81,23 +81,33 @@ export default function Catalog() {
   return (
     <MainLayout>
       <section>
-        <header className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {t("catalog.title")}
-          </h1>
-          <p className="text-gray-600">{t("catalog.subtitle")}</p>
+        <header className="bandeau-relief mb-6">
+          <div className="bandeau-relief-bloc">
+            <h1 className="titre-1">{t("catalog.title")}</h1>
+            <p className="corps text-encre-douce">{t("catalog.subtitle")}</p>
+          </div>
         </header>
 
-        <div className="mb-6 grid gap-3 bg-white p-4 rounded-xl shadow-sm sm:grid-cols-2 lg:grid-cols-4">
+        {/* La recherche se fait à la frappe ; le bouton reste pour le geste */}
+        <form
+          role="search"
+          className="recherche mb-4"
+          onSubmit={(e) => e.preventDefault()}
+        >
           <input
             type="search"
             placeholder={t("catalog.searchPlaceholder")}
             aria-label={t("catalog.searchLabel")}
-            className="w-full border border-gray-300 rounded-md p-2 lg:col-span-2"
+            className="champ"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+          <button type="submit" className="btn btn-principal">
+            {t("catalog.searchButton")}
+          </button>
+        </form>
 
+        <div className="zone-filtres mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
           <select
             aria-label={t("language.contentLabel")}
             className={selectClass}
@@ -154,7 +164,6 @@ export default function Catalog() {
             ))}
           </select>
 
-          {/* Les intitulés des formes sont longs */}
           <select
             aria-label={t("catalog.formLabel")}
             className={`${selectClass} sm:col-span-2`}
@@ -171,13 +180,15 @@ export default function Catalog() {
         </div>
 
         {loading ? (
-          <p className="text-gray-600">{t("common.loading")}</p>
+          <p className="corps text-encre-douce">{t("common.loading")}</p>
         ) : error ? (
-          <p className="text-red-600">{error}</p>
+          <p role="alert" className="corps-fort text-danger">
+            {error}
+          </p>
         ) : activities.length === 0 ? (
-          <p className="text-gray-600">{t("catalog.empty")}</p>
+          <p className="corps text-encre-douce">{t("catalog.empty")}</p>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grille-fiches">
             {activities.map((activity) => (
               <ActivityCard key={activity.id} activity={activity} />
             ))}
