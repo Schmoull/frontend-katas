@@ -103,20 +103,20 @@ export default function AdminReferenceData() {
 
   return (
     <MainLayout>
-      <section className="max-w-6xl space-y-6">
+      <section className="space-y-10">
         <header>
-          <h1 className="text-2xl font-bold text-gray-900">
-            {t("adminReference.title")}
-          </h1>
-          <p className="text-sm text-gray-600">
+          <h1 className="titre-1">{t("adminReference.title")}</h1>
+          <p className="corps mt-2 text-encre-douce">
             {t("adminReference.subtitle")}
           </p>
         </header>
 
         {loading ? (
-          <p className="text-gray-600">{t("common.loading")}</p>
+          <p className="corps text-encre-douce">{t("common.loading")}</p>
         ) : error ? (
-          <p className="text-red-600">{error}</p>
+          <p role="alert" className="corps-fort text-danger">
+            {error}
+          </p>
         ) : (
           <>
             <ReferenceTable

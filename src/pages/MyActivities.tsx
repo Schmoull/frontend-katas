@@ -49,14 +49,9 @@ export default function MyActivities() {
   return (
     <MainLayout>
       <section>
-        <header className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {t("myActivities.title")}
-          </h1>
-          <Link
-            to="/activites/nouvelle"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-          >
+        <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <h1 className="titre-1">{t("myActivities.title")}</h1>
+          <Link to="/activites/nouvelle" className="btn btn-principal">
             {t("myActivities.newActivity")}
           </Link>
         </header>
@@ -65,12 +60,10 @@ export default function MyActivities() {
           {(["", ...ACTIVITY_STATUSES] as const).map((status) => (
             <button
               key={status || "all"}
+              type="button"
               onClick={() => setStatusFilter(status)}
-              className={`px-3 py-1 rounded-full text-sm font-medium ${
-                statusFilter === status
-                  ? "bg-indigo-600 text-white"
-                  : "bg-white text-gray-700 hover:bg-indigo-100"
-              }`}
+              aria-pressed={statusFilter === status}
+              className="choix"
             >
               {status ? t(`statuses.${status}`) : t("myActivities.all")}
             </button>
@@ -78,17 +71,19 @@ export default function MyActivities() {
         </div>
 
         {loading ? (
-          <p className="text-gray-600">{t("common.loading")}</p>
+          <p className="corps text-encre-douce">{t("common.loading")}</p>
         ) : error ? (
-          <p className="text-red-600">{error}</p>
+          <p role="alert" className="corps-fort text-danger">
+            {error}
+          </p>
         ) : visible.length === 0 ? (
-          <p className="text-gray-600">
+          <p className="corps text-encre-douce">
             {activities.length === 0
               ? t("myActivities.empty")
               : t("myActivities.emptyStatus")}
           </p>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grille-fiches">
             {visible.map((activity) => (
               <ActivityCard key={activity.id} activity={activity} showStatus />
             ))}

@@ -51,53 +51,50 @@ export default function AdminUsers() {
   return (
     <MainLayout>
       <section className="max-w-4xl">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          {t("adminUsers.title")}
-        </h1>
-        <p className="mb-6 text-sm text-gray-600">{t("adminUsers.help")}</p>
+        <h1 className="titre-1 mb-2">{t("adminUsers.title")}</h1>
+        <p className="corps mb-6 text-encre-douce">{t("adminUsers.help")}</p>
 
         {loading ? (
-          <p className="text-gray-600">{t("common.loading")}</p>
+          <p className="corps text-encre-douce">{t("common.loading")}</p>
         ) : error ? (
-          <p className="text-red-600">{error}</p>
+          <p role="alert" className="corps-fort text-danger">
+            {error}
+          </p>
         ) : (
-          <div className="bg-white rounded-xl shadow-sm overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead className="bg-gray-100 text-left text-gray-600">
+          <div className="overflow-x-auto shadow-posee">
+            <table className="tableau">
+              <thead>
                 <tr>
-                  <th className="px-4 py-2">{t("adminUsers.name")}</th>
-                  <th className="px-4 py-2">{t("adminUsers.email")}</th>
-                  <th className="px-4 py-2">{t("adminUsers.registered")}</th>
-                  <th className="px-4 py-2">{t("adminUsers.role")}</th>
+                  <th>{t("adminUsers.name")}</th>
+                  <th>{t("adminUsers.email")}</th>
+                  <th>{t("adminUsers.registered")}</th>
+                  <th>{t("adminUsers.role")}</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((account) => {
                   const isMe = account.id === user?.id;
                   return (
-                    <tr
-                      key={account.id}
-                      className="odd:bg-white even:bg-gray-50"
-                    >
-                      <td className="px-4 py-2 font-medium">
+                    <tr key={account.id}>
+                      <td className="font-semibold">
                         {account.display_name}
                         {isMe && (
-                          <span className="text-gray-500">
+                          <span className="font-normal text-encre-discrete">
                             {t("adminUsers.you")}
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-2">{account.email}</td>
-                      <td className="px-4 py-2">
+                      <td>{account.email}</td>
+                      <td className="donnee">
                         {formatDate(account.created_at)}
                       </td>
-                      <td className="px-4 py-2">
+                      <td>
                         {/* Son propre rôle n'est pas modifiable (refusé par la base) */}
                         <select
                           aria-label={t("adminUsers.roleOf", {
                             name: account.display_name,
                           })}
-                          className="border border-gray-300 rounded-md p-1 bg-white disabled:opacity-60"
+                          className="champ disabled:opacity-60"
                           value={account.role}
                           disabled={isMe || savingId === account.id}
                           onChange={(e) =>

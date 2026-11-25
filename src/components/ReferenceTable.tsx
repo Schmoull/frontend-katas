@@ -35,9 +35,8 @@ function emptyValues(fields: ReferenceField[]): ReferenceValues {
   return Object.fromEntries(fields.map((f) => [f.key, ""]));
 }
 
-const inputClass = "w-full border border-gray-300 rounded-md p-1 bg-white";
-const smallButton =
-  "px-2 py-1 rounded-md text-sm border disabled:opacity-50 whitespace-nowrap";
+const inputClass = "champ";
+const smallButton = "btn btn-petit whitespace-nowrap";
 
 export default function ReferenceTable<T extends { id: string }>({
   title,
@@ -124,29 +123,30 @@ export default function ReferenceTable<T extends { id: string }>({
   const editFormId = `${formIdPrefix}-edit`;
 
   return (
-    <section className="bg-white rounded-xl shadow-sm p-4">
-      <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-      {help && <p className="mt-1 text-sm text-gray-600">{help}</p>}
+    <section>
+      <h2 className="titre-2">{title}</h2>
+      {help && <p className="corps mt-2 text-encre-douce">{help}</p>}
 
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && (
+        <p role="alert" className="corps-fort mt-2 text-danger">
+          {error}
+        </p>
+      )}
 
       {/* Formulaires détachés du tableau (attribut form des champs) */}
       <form id={createFormId} onSubmit={handleCreate} />
       <form id={editFormId} onSubmit={handleUpdate} />
 
-      <div className="mt-3 overflow-x-auto">
-        <table className="w-full border-collapse text-sm">
-          <thead className="bg-gray-100 text-left text-gray-600">
+      <div className="mt-4 overflow-x-auto shadow-posee">
+        <table className="tableau">
+          <thead>
             <tr>
               {fields.map((field) => (
-                <th
-                  key={field.key}
-                  className={`px-2 py-2 ${field.className ?? ""}`}
-                >
+                <th key={field.key} className={field.className}>
                   {field.label}
                 </th>
               ))}
-              <th className="px-2 py-2 w-40" />
+              <th className="w-48" />
             </tr>
           </thead>
           <tbody>
@@ -156,9 +156,9 @@ export default function ReferenceTable<T extends { id: string }>({
 
               if (editingId === item.id) {
                 return (
-                  <tr key={item.id} className="bg-indigo-50">
+                  <tr key={item.id} className="bg-signal/25">
                     {fields.map((field) => (
-                      <td key={field.key} className="px-2 py-1">
+                      <td key={field.key}>
                         {renderInput(
                           field,
                           editValues,
@@ -167,20 +167,20 @@ export default function ReferenceTable<T extends { id: string }>({
                         )}
                       </td>
                     ))}
-                    <td className="px-2 py-1">
+                    <td>
                       <div className="flex gap-1">
                         <button
                           type="submit"
                           form={editFormId}
                           disabled={busy}
-                          className={`${smallButton} border-indigo-600 bg-indigo-600 text-white`}
+                          className={`${smallButton} btn-secondaire`}
                         >
                           {t("common.save")}
                         </button>
                         <button
                           type="button"
                           onClick={() => setEditingId(null)}
-                          className={`${smallButton} border-gray-300`}
+                          className={`${smallButton} btn-discret`}
                         >
                           {t("common.cancel")}
                         </button>
@@ -191,15 +191,13 @@ export default function ReferenceTable<T extends { id: string }>({
               }
 
               return (
-                <tr key={item.id} className="odd:bg-white even:bg-gray-50">
+                <tr key={item.id}>
                   {fields.map((field) => (
-                    <td key={field.key} className="px-2 py-2">
-                      {values[field.key]}
-                    </td>
+                    <td key={field.key}>{values[field.key]}</td>
                   ))}
-                  <td className="px-2 py-2">
+                  <td>
                     {locked ? (
-                      <span className="text-xs text-gray-500">
+                      <span className="legende text-encre-discrete">
                         {t("common.locked")}
                       </span>
                     ) : (
@@ -208,7 +206,7 @@ export default function ReferenceTable<T extends { id: string }>({
                           type="button"
                           onClick={() => startEdit(item)}
                           disabled={busy || editingId !== null}
-                          className={`${smallButton} border-gray-300 hover:bg-gray-50`}
+                          className={`${smallButton} btn-contour`}
                         >
                           {t("common.edit")}
                         </button>
@@ -216,7 +214,7 @@ export default function ReferenceTable<T extends { id: string }>({
                           type="button"
                           onClick={() => handleDelete(item)}
                           disabled={busy || editingId !== null}
-                          className={`${smallButton} border-red-300 text-red-700 hover:bg-red-50`}
+                          className={`${smallButton} btn-contour border-danger text-danger`}
                         >
                           {t("common.delete")}
                         </button>
@@ -228,18 +226,18 @@ export default function ReferenceTable<T extends { id: string }>({
             })}
 
             {/* Ligne d'ajout */}
-            <tr className="border-t">
+            <tr className="bg-papier">
               {fields.map((field) => (
-                <td key={field.key} className="px-2 py-2">
+                <td key={field.key}>
                   {renderInput(field, newValues, setNewValues, createFormId)}
                 </td>
               ))}
-              <td className="px-2 py-2">
+              <td>
                 <button
                   type="submit"
                   form={createFormId}
                   disabled={busy || editingId !== null}
-                  className={`${smallButton} border-indigo-600 text-indigo-700 hover:bg-indigo-50`}
+                  className={`${smallButton} btn-contour`}
                 >
                   {t("common.add")}
                 </button>

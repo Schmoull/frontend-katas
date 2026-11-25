@@ -47,33 +47,35 @@ export default function ArchivedActivities() {
     <MainLayout>
       <section>
         <header className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {t("archives.title")}
-          </h1>
-          <p className="text-gray-600">{t("archives.subtitle")}</p>
+          <h1 className="titre-1">{t("archives.title")}</h1>
+          <p className="corps mt-2 text-encre-douce">
+            {t("archives.subtitle")}
+          </p>
         </header>
 
         <input
           type="search"
           placeholder={t("archives.searchPlaceholder")}
           aria-label={t("archives.searchLabel")}
-          className="mb-6 w-full max-w-md border border-gray-300 rounded-md p-2 bg-white"
+          className="champ mb-6 max-w-md"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
         {loading ? (
-          <p className="text-gray-600">{t("common.loading")}</p>
+          <p className="corps text-encre-douce">{t("common.loading")}</p>
         ) : error ? (
-          <p className="text-red-600">{error}</p>
+          <p role="alert" className="corps-fort text-danger">
+            {error}
+          </p>
         ) : visible.length === 0 ? (
-          <p className="text-gray-600">
+          <p className="corps text-encre-douce">
             {activities.length === 0
               ? t("archives.empty")
               : t("archives.emptySearch")}
           </p>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grille-fiches">
             {visible.map((activity) => (
               <ActivityCard key={activity.id} activity={activity} showAuthor />
             ))}

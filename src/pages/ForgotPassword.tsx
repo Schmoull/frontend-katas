@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabaseClient";
-import LanguageSwitcher from "../components/LanguageSwitcher";
+import AuthLayout from "../layouts/AuthLayout";
 
 export default function ForgotPassword() {
   const { t } = useTranslation();
@@ -35,68 +35,58 @@ export default function ForgotPassword() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-md">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {t("forgot.title")}
-          </h1>
-          <LanguageSwitcher />
-        </div>
-
-        {sent ? (
-          // Même message que le compte existe ou non (ne pas révéler les emails inscrits)
-          <p className="text-gray-600">
-            <Trans
-              i18nKey="forgot.sent"
-              values={{ email }}
-              components={{ strong: <strong /> }}
-            />
-          </p>
-        ) : (
-          <>
-            <p className="mb-4 text-sm text-gray-600">{t("forgot.intro")}</p>
-
-            {errorMsg && (
-              <p className="mb-4 text-sm text-red-600">{errorMsg}</p>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label
-                  className="block text-sm font-medium mb-1"
-                  htmlFor="email"
-                >
-                  {t("common.email")}
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  className="w-full border border-gray-300 rounded-md p-2"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2 rounded-md bg-indigo-600 text-white font-medium hover:bg-indigo-700 disabled:opacity-50"
-              >
-                {loading ? t("forgot.submitting") : t("forgot.submit")}
-              </button>
-            </form>
-          </>
-        )}
-
-        <p className="mt-4 text-sm text-gray-600">
-          <Link to="/login" className="text-indigo-600 hover:underline">
-            {t("forgot.back")}
-          </Link>
+    <AuthLayout title={t("forgot.title")}>
+      {sent ? (
+        // Même message que le compte existe ou non (ne pas révéler les emails inscrits)
+        <p className="corps text-encre-douce">
+          <Trans
+            i18nKey="forgot.sent"
+            values={{ email }}
+            components={{ strong: <strong /> }}
+          />
         </p>
-      </div>
-    </main>
+      ) : (
+        <>
+          <p className="corps mb-4 text-encre-douce">{t("forgot.intro")}</p>
+
+          {errorMsg && (
+            <p role="alert" className="corps-fort mb-4 text-danger">
+              {errorMsg}
+            </p>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="libelle" htmlFor="email">
+                {t("common.email")}
+              </label>
+              <input
+                id="email"
+                type="email"
+                className="champ"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn btn-principal w-full"
+            >
+              {loading ? t("forgot.submitting") : t("forgot.submit")}
+            </button>
+          </form>
+        </>
+      )}
+
+      <p className="petit mt-6 text-encre-douce">
+        <Link to="/login" className="lien">
+          {t("forgot.back")}
+        </Link>
+      </p>
+    </AuthLayout>
   );
 }

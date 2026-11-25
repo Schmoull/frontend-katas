@@ -34,18 +34,18 @@ export default function Favorites() {
   return (
     <MainLayout>
       <section>
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">
-          {t("favorites.title")}
-        </h1>
+        <h1 className="titre-1 mb-6">{t("favorites.title")}</h1>
 
         {loading ? (
-          <p className="text-gray-600">{t("common.loading")}</p>
+          <p className="corps text-encre-douce">{t("common.loading")}</p>
         ) : error ? (
-          <p className="text-red-600">{error}</p>
+          <p role="alert" className="corps-fort text-danger">
+            {error}
+          </p>
         ) : activities.length === 0 ? (
-          <p className="text-gray-600">{t("favorites.empty")}</p>
+          <p className="corps text-encre-douce">{t("favorites.empty")}</p>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grille-fiches">
             {activities.map((activity) => (
               <ActivityCard key={activity.id} activity={activity} />
             ))}

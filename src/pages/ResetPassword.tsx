@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../contexts/useAuth";
-import LanguageSwitcher from "../components/LanguageSwitcher";
+import AuthLayout from "../layouts/AuthLayout";
 
 // Erreur renvoyée par Supabase dans l'URL quand le lien est invalide ou expiré
 // (ex. #error=access_denied&error_code=otp_expired&error_description=...)
@@ -48,15 +48,14 @@ export default function ResetPassword() {
 
   let content;
   if (authLoading) {
-    content = <p className="text-gray-600">{t("reset.checking")}</p>;
+    content = <p className="corps text-encre-douce">{t("reset.checking")}</p>;
   } else if (!user) {
     content = (
-      <div className="space-y-4">
-        <p className="text-red-600">{linkError ?? t("reset.invalid")}</p>
-        <Link
-          to="/mot-de-passe-oublie"
-          className="text-indigo-600 hover:underline"
-        >
+      <div className="space-y-5">
+        <p role="alert" className="corps-fort text-danger">
+          {linkError ?? t("reset.invalid")}
+        </p>
+        <Link to="/mot-de-passe-oublie" className="lien">
           {t("reset.requestNew")}
         </Link>
       </div>
@@ -64,20 +63,21 @@ export default function ResetPassword() {
   } else {
     content = (
       <>
-        {errorMsg && <p className="mb-4 text-sm text-red-600">{errorMsg}</p>}
+        {errorMsg && (
+          <p role="alert" className="corps-fort mb-4 text-danger">
+            {errorMsg}
+          </p>
+        )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label
-              className="block text-sm font-medium mb-1"
-              htmlFor="password"
-            >
+            <label className="libelle" htmlFor="password">
               {t("reset.newPassword")}
             </label>
             <input
               id="password"
               type="password"
-              className="w-full border border-gray-300 rounded-md p-2"
+              className="champ"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="new-password"
@@ -87,16 +87,13 @@ export default function ResetPassword() {
           </div>
 
           <div>
-            <label
-              className="block text-sm font-medium mb-1"
-              htmlFor="confirmation"
-            >
+            <label className="libelle" htmlFor="confirmation">
               {t("reset.confirm")}
             </label>
             <input
               id="confirmation"
               type="password"
-              className="w-full border border-gray-300 rounded-md p-2"
+              className="champ"
               value={confirmation}
               onChange={(e) => setConfirmation(e.target.value)}
               autoComplete="new-password"
@@ -108,7 +105,7 @@ export default function ResetPassword() {
           <button
             type="submit"
             disabled={saving}
-            className="w-full py-2 rounded-md bg-indigo-600 text-white font-medium hover:bg-indigo-700 disabled:opacity-50"
+            className="btn btn-principal w-full"
           >
             {saving ? t("common.saving") : t("reset.submit")}
           </button>
@@ -117,17 +114,5 @@ export default function ResetPassword() {
     );
   }
 
-  return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-md">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {t("reset.title")}
-          </h1>
-          <LanguageSwitcher />
-        </div>
-        {content}
-      </div>
-    </main>
-  );
+  return <AuthLayout title={t("reset.title")}>{content}</AuthLayout>;
 }

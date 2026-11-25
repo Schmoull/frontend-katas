@@ -16,7 +16,9 @@ export default function ProtectedRoute({ children, minRole }: Props) {
   const location = useLocation();
 
   if (loading) {
-    return <p className="p-4 text-gray-600">{t("nav.checkingSession")}</p>;
+    return (
+      <p className="corps p-4 text-encre-douce">{t("nav.checkingSession")}</p>
+    );
   }
 
   if (!user) {

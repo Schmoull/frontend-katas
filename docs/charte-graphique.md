@@ -52,6 +52,7 @@ Tailwind v4 se configure en CSS : il n'y a pas de `tailwind.config.js`.
 | Etiquette              | `etiquette-type` (+ `sur-sombre`), `pastille-branche`, `badge-js`, `puce-donnee`                                 |
 | FicheActivite          | `fiche`, `fiche-tete`, `fiche-corps`, `fiche-titre`, `fiche-resume`, `fiche-pied`, `grille-fiches`, `btn-favori` |
 | BandeauRelief          | `bandeau-relief` + `bandeau-relief-bloc`, `bandeau-foret`                                                        |
+| (propres à l'app)      | `entete`, `nav-lien`, `btn-petit`, `lien`, `choix` (filtre exclusif, `aria-pressed`), `zone-filtres`, `tableau`  |
 
 Exemple d'en-tête de fiche :
 
@@ -91,5 +92,7 @@ La table `activity_types` a 9 types, la charte en prévoit 7 :
 - [x] Lot 1 : en-tête (`MainLayout`), catalogue, fiche d'activité, favori,
       statut, langue, déconnexion.
 - [x] Lot 2 : détail et formulaire d'une activité.
-- [ ] Lot 3 : connexion, profil, administration, listes.
+- [x] Lot 3 : connexion (`AuthLayout`), profil, administration, listes.
+- [ ] Ne plus utiliser que les classes et jetons de la charte dans les
+      nouveaux écrans (aucune couleur Tailwind brute).
 - [ ] Définir couleur et pictogramme pour Réflexion et Service.
