@@ -2,29 +2,36 @@
 
 @layer base {
   html {
-    font-family: var(--font-sans);
-    color: var(--color-ink);
-    background-color: var(--color-background);
+    font-family: var(--font-texte);
+    font-size: 100%;
+    line-height: 1.55;
+    color: var(--color-encre);
+    background-color: var(--color-papier);
     -webkit-font-smoothing: antialiased;
   }
 
   h1,
   h2,
   h3 {
-    font-family: var(--font-display);
-    color: var(--color-ink);
+    font-family: var(--font-titre);
+    color: var(--color-encre);
   }
 
   a {
-    color: var(--color-primary-600);
+    color: var(--color-encre);
+    text-decoration-color: var(--color-signal);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
   }
 
-  a:hover {
-    color: var(--color-primary-700);
-  }
-
+  /* Focus clavier : contour signal de 3px décalé de 3px */
   :focus-visible {
-    outline: 2px solid var(--color-primary-500);
-    outline-offset: 2px;
+    outline: 3px solid var(--color-signal);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: var(--color-signal);
+    color: var(--color-encre);
   }
 }

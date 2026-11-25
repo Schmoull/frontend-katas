@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124 72" width="124" height="72" role="img" aria-label="Scoutoria">
+<path d="M1,1 H84 V71 H1 Z" fill="#FFFFFF"></path>
+<path d="M84,1 H100 L123,36.0 L100,71 H84 Z" fill="#F2B705"></path>
+<path d="M84,1 V71" stroke="#1D1D1B" stroke-width="2"></path>
+<circle cx="50.0" cy="23.6" r="10.3" fill="#F2B705"></circle><path d="M23.6,52.4 L38.5,22.5 L53.5,52.4 Z" fill="#E8541E"></path><path d="M38.5,22.5 L34.5,52.4 L42.6,52.4 Z" fill="#1D1D1B"></path><rect x="20.2" y="51.8" width="43.7" height="2.5" fill="#1D1D1B"></rect>
+<path d="M1,1 H100 L123,36.0 L100,71 H1 Z" fill="none" stroke="#1D1D1B" stroke-width="2"></path>
+</svg>

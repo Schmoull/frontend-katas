@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
-/* Charte graphique : jetons → base → composants */
+/* Charte graphique Scoutoria : jetons → base → typographie → composants */
 @import "./styles/tokens.css";
 @import "./styles/base.css";
+@import "./styles/typography.css";
 @import "./styles/components.css";
