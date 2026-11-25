@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import MainLayout from "../layouts/MainLayout";
@@ -18,6 +18,7 @@ import {
   formatDuration,
   formatParticipants,
 } from "../lib/format";
+import { activityTypeStyle } from "../lib/activityTypeStyle";
 import { localizedName, type ContentLanguage } from "../i18n/languages";
 import type { Activity, ActivityStatus, LocationType } from "../types";
 
@@ -34,17 +35,24 @@ function Section({
 }) {
   if (!text) return null;
   return (
-    <div>
-      <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-      <p className="mt-1 whitespace-pre-line text-gray-700" lang={lang}>
+    <section>
+      <h2 className="titre-3">{title}</h2>
+      <p className="corps mt-2 whitespace-pre-line" lang={lang}>
         {text}
       </p>
-    </div>
+    </section>
   );
 }
 
-const secondaryButton =
-  "px-3 py-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50";
+// Retour au catalogue, pour les pages d'erreur
+function BackLink() {
+  const { t } = useTranslation();
+  return (
+    <Link to="/" className="btn btn-discret mt-4">
+      {t("common.backToCatalog")}
+    </Link>
+  );
+}
 
 export default function ActivityDetail() {
   const { t } = useTranslation();
@@ -109,7 +117,7 @@ export default function ActivityDetail() {
   if (loading) {
     return (
       <MainLayout>
-        <p className="text-gray-600">{t("common.loading")}</p>
+        <p className="corps text-encre-douce">{t("common.loading")}</p>
       </MainLayout>
     );
   }
@@ -117,21 +125,19 @@ export default function ActivityDetail() {
   if (error || !activity) {
     return (
       <MainLayout>
-        <p className="text-red-600">{error ?? t("common.activityNotFound")}</p>
-        <Link
-          to="/"
-          className="mt-4 inline-block text-indigo-600 hover:underline"
-        >
-          {t("common.backToCatalog")}
-        </Link>
+        <p role="alert" className="corps-fort text-danger">
+          {error ?? t("common.activityNotFound")}
+        </p>
+        <BackLink />
       </MainLayout>
     );
   }
 
   const can = activityPermissions(activity, user?.id, profile?.role);
   const lang = activity.language;
+  const typeStyle = activityTypeStyle(activity.activity_type?.name);
 
-  const facts = [
+  const facts: { label: string; value: ReactNode }[] = [
     {
       label: t("detail.duration"),
       value: formatDuration(activity.duration_minutes),
@@ -151,7 +157,16 @@ export default function ActivityDetail() {
     },
     {
       label: t("detail.ageBranches"),
-      value: activity.age_branches.map(formatAgeBranch).join(", ") || null,
+      value:
+        activity.age_branches.length > 0 ? (
+          <ul className="flex flex-wrap gap-1.5">
+            {activity.age_branches.map((branch) => (
+              <li key={branch.id} className="pastille-branche">
+                {formatAgeBranch(branch)}
+              </li>
+            ))}
+          </ul>
+        ) : null,
     },
     {
       label: t("detail.language"),
@@ -161,72 +176,82 @@ export default function ActivityDetail() {
 
   return (
     <MainLayout>
-      <article className="max-w-3xl mx-auto space-y-6">
-        <header className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
+      <article className="mx-auto max-w-3xl space-y-8">
+        <header className="bg-papier-clair shadow-posee">
+          <div className={`fiche-tete h-20 ${typeStyle.className}`}>
+            <span className="etiquette-type">
+              {typeStyle.pictogram && (
+                <img src={typeStyle.pictogram} alt="" className="size-10" />
+              )}
               {activity.activity_type && localizedName(activity.activity_type)}
-            </p>
+            </span>
             {activity.status !== "published" && (
               <StatusBadge status={activity.status} />
             )}
           </div>
-          <h1 className="text-3xl font-bold text-gray-900" lang={lang}>
-            {activity.title}
-          </h1>
-          <p className="text-sm text-gray-500">
-            {t("common.by", {
-              name: activity.author?.display_name ?? t("common.unknownAuthor"),
-            })}
-            {activity.published_at &&
-              t("detail.publishedOn", {
-                date: formatDate(activity.published_at),
+          <div className="space-y-2 p-6">
+            <h1 className="titre-1 text-4xl md:text-5xl" lang={lang}>
+              {activity.title}
+            </h1>
+            <p className="legende text-encre-discrete">
+              {t("common.by", {
+                name:
+                  activity.author?.display_name ?? t("common.unknownAuthor"),
               })}
-          </p>
+              {activity.published_at &&
+                t("detail.publishedOn", {
+                  date: formatDate(activity.published_at),
+                })}
+            </p>
+          </div>
         </header>
 
         <div className="flex flex-wrap gap-2">
-          {user && <FavoriteButton activityId={activity.id} />}
-          {can.canEdit && (
-            <Link
-              to={`/activites/${activity.id}/modifier`}
-              className="px-3 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
-            >
-              {t("common.edit")}
-            </Link>
-          )}
           {can.canPublish && (
             <button
+              type="button"
               disabled={busy}
               onClick={() => changeStatus("published")}
-              className={secondaryButton}
+              className="btn btn-principal"
             >
               {t("detail.publish")}
             </button>
           )}
+          {can.canEdit && (
+            <Link
+              to={`/activites/${activity.id}/modifier`}
+              className="btn btn-secondaire"
+            >
+              {t("common.edit")}
+            </Link>
+          )}
+          {user && <FavoriteButton activityId={activity.id} />}
           {can.canUnpublish && (
             <button
+              type="button"
               disabled={busy}
               onClick={() => changeStatus("draft")}
-              className={secondaryButton}
+              className="btn btn-contour"
             >
               {t("detail.unpublish")}
             </button>
           )}
           {can.canArchive && (
             <button
+              type="button"
               disabled={busy}
               onClick={() => changeStatus("archived")}
-              className={secondaryButton}
+              className="btn btn-contour"
             >
               {t("detail.archive")}
             </button>
           )}
           {can.canDelete && (
             <button
+              type="button"
               disabled={busy}
               onClick={handleDelete}
-              className="px-3 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+              className="btn btn-danger"
             >
               {t("common.delete")}
             </button>
@@ -234,33 +259,35 @@ export default function ActivityDetail() {
         </div>
 
         {facts.length > 0 && (
-          <dl className="grid gap-4 rounded-xl bg-white p-4 shadow-sm sm:grid-cols-2">
+          <dl className="grid gap-x-6 gap-y-4 bg-papier-fonce p-6 sm:grid-cols-2">
             {facts.map((fact) => (
               <div key={fact.label}>
-                <dt className="text-sm text-gray-500">{fact.label}</dt>
-                <dd className="font-medium">{fact.value}</dd>
+                <dt className="surtitre text-encre-douce">{fact.label}</dt>
+                <dd className="donnee mt-1">{fact.value}</dd>
               </div>
             ))}
           </dl>
         )}
 
         {activity.characteristic_forms.length > 0 && (
-          <div className="rounded-xl bg-white p-4 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900">
-              {t("detail.characteristicForms")}
-            </h2>
-            <ul className="mt-2 space-y-1 text-gray-700">
+          <section>
+            <h2 className="titre-3">{t("detail.characteristicForms")}</h2>
+            <ul className="mt-3 space-y-2">
               {activity.characteristic_forms.map((form) => (
-                <li key={form.id}>
-                  <span className="font-semibold">{form.position}.</span>{" "}
-                  {localizedName(form)}
+                <li key={form.id} className="flex items-start gap-3">
+                  <span className="badge-js shrink-0">
+                    <span>
+                      {t("card.formBadge", { position: form.position })}
+                    </span>
+                  </span>
+                  <span className="corps">{localizedName(form)}</span>
                 </li>
               ))}
             </ul>
-          </div>
+          </section>
         )}
 
-        <div className="space-y-6 rounded-xl bg-white p-6 shadow-sm">
+        <div className="space-y-8 bg-papier-clair p-6 shadow-posee md:p-8">
           <Section
             title={t("detail.description")}
             text={activity.description}

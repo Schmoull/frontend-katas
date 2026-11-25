@@ -108,7 +108,7 @@ function toInput(values: FormValues, status: ActivityStatus): ActivityInput {
   };
 }
 
-const inputClass = "w-full border border-gray-300 rounded-md p-2 bg-white";
+const inputClass = "champ";
 
 function Field({
   label,
@@ -123,7 +123,7 @@ function Field({
 }) {
   return (
     <div className={className}>
-      <label className="block text-sm font-medium mb-1" htmlFor={htmlFor}>
+      <label className="libelle" htmlFor={htmlFor}>
         {label}
       </label>
       {children}
@@ -238,7 +238,7 @@ export default function ActivityForm() {
   if (loading) {
     return (
       <MainLayout>
-        <p className="text-gray-600">{t("common.loading")}</p>
+        <p className="corps text-encre-douce">{t("common.loading")}</p>
       </MainLayout>
     );
   }
@@ -246,11 +246,10 @@ export default function ActivityForm() {
   if (loadError) {
     return (
       <MainLayout>
-        <p className="text-red-600">{loadError}</p>
-        <Link
-          to="/"
-          className="mt-4 inline-block text-indigo-600 hover:underline"
-        >
+        <p role="alert" className="corps-fort text-danger">
+          {loadError}
+        </p>
+        <Link to="/" className="btn btn-discret mt-4">
           {t("common.backToCatalog")}
         </Link>
       </MainLayout>
@@ -263,20 +262,20 @@ export default function ActivityForm() {
 
   return (
     <MainLayout>
-      <section className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">
+      <section className="mx-auto max-w-3xl">
+        <h1 className="titre-1 mb-6">
           {isEdit ? t("form.titleEdit") : t("form.titleNew")}
         </h1>
 
         {noTypes && (
-          <p className="mb-4 rounded-md bg-amber-50 p-3 text-sm text-amber-800">
+          <p role="status" className="corps-fort mb-6 bg-papier-fonce p-4">
             {t("form.noTypes")}
           </p>
         )}
 
         <form
           onSubmit={handleSubmit}
-          className="bg-white p-6 rounded-xl shadow-sm grid gap-4 md:grid-cols-2"
+          className="grid gap-x-4 gap-y-6 md:grid-cols-2"
         >
           <Field
             label={t("form.title")}
@@ -336,22 +335,23 @@ export default function ActivityForm() {
           </Field>
 
           <fieldset className="md:col-span-2">
-            <legend className="block text-sm font-medium mb-1">
-              {t("form.forms")}
-            </legend>
-            <div className="space-y-2">
+            <legend className="libelle">{t("form.forms")}</legend>
+            <div className="space-y-1 bg-papier-clair p-3">
               {characteristicForms.map((form) => (
-                <label key={form.id} className="flex items-start gap-2">
+                <label
+                  key={form.id}
+                  className="corps flex cursor-pointer items-start gap-3 p-1"
+                >
                   <input
                     type="checkbox"
-                    className="mt-1"
+                    className="mt-1 size-5 shrink-0 accent-encre"
                     checked={values.characteristic_form_ids.includes(form.id)}
                     onChange={() =>
                       toggleId("characteristic_form_ids", form.id)
                     }
                   />
                   <span>
-                    <span className="font-semibold">{form.position}.</span>{" "}
+                    <span className="donnee">{form.position}.</span>{" "}
                     {localizedName(form)}
                   </span>
                 </label>
@@ -410,17 +410,19 @@ export default function ActivityForm() {
           </div>
 
           <fieldset className="md:col-span-2">
-            <legend className="block text-sm font-medium mb-1">
-              {t("form.ageBranches")}
-            </legend>
+            <legend className="libelle">{t("form.ageBranches")}</legend>
             {ageBranches.length === 0 ? (
-              <p className="text-sm text-gray-500">{t("form.noAgeBranches")}</p>
+              <p className="aide">{t("form.noAgeBranches")}</p>
             ) : (
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2">
                 {ageBranches.map((branch) => (
-                  <label key={branch.id} className="flex items-center gap-2">
+                  <label
+                    key={branch.id}
+                    className="pastille-branche h-9 cursor-pointer gap-2 has-checked:bg-encre has-checked:text-papier"
+                  >
                     <input
                       type="checkbox"
+                      className="size-4 accent-signal"
                       checked={values.age_branch_ids.includes(branch.id)}
                       onChange={() => toggleId("age_branch_ids", branch.id)}
                     />
@@ -439,7 +441,7 @@ export default function ActivityForm() {
             <textarea
               id="description"
               lang={lang}
-              className={`${inputClass} min-h-[100px]`}
+              className={`${inputClass} min-h-[140px]`}
               value={values.description}
               onChange={(e) => set("description", e.target.value)}
             />
@@ -453,7 +455,7 @@ export default function ActivityForm() {
             <textarea
               id="pedagogical_objective"
               lang={lang}
-              className={`${inputClass} min-h-[80px]`}
+              className={`${inputClass} min-h-[100px]`}
               value={values.pedagogical_objective}
               onChange={(e) => set("pedagogical_objective", e.target.value)}
             />
@@ -467,7 +469,7 @@ export default function ActivityForm() {
             <textarea
               id="material_needed"
               lang={lang}
-              className={`${inputClass} min-h-[60px]`}
+              className={`${inputClass} min-h-[100px]`}
               value={values.material_needed}
               onChange={(e) => set("material_needed", e.target.value)}
             />
@@ -481,7 +483,7 @@ export default function ActivityForm() {
             <textarea
               id="safety_notes"
               lang={lang}
-              className={`${inputClass} min-h-[60px]`}
+              className={`${inputClass} min-h-[100px]`}
               value={values.safety_notes}
               onChange={(e) => set("safety_notes", e.target.value)}
             />
@@ -495,7 +497,7 @@ export default function ActivityForm() {
             <textarea
               id="narrative_theme"
               lang={lang}
-              className={`${inputClass} min-h-[60px]`}
+              className={`${inputClass} min-h-[100px]`}
               value={values.narrative_theme}
               onChange={(e) => set("narrative_theme", e.target.value)}
             />
@@ -509,20 +511,22 @@ export default function ActivityForm() {
             <textarea
               id="theme_adaptation_notes"
               lang={lang}
-              className={`${inputClass} min-h-[60px]`}
+              className={`${inputClass} min-h-[100px]`}
               value={values.theme_adaptation_notes}
               onChange={(e) => set("theme_adaptation_notes", e.target.value)}
             />
           </Field>
 
           {formError && (
-            <p className="md:col-span-2 text-sm text-red-600">{formError}</p>
+            <p role="alert" className="corps-fort text-danger md:col-span-2">
+              {formError}
+            </p>
           )}
 
-          <div className="md:col-span-2 flex flex-wrap justify-end gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-3 border-t-2 border-encre pt-6 md:col-span-2">
             <Link
               to={isEdit ? `/activites/${id}` : "/mes-activites"}
-              className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-50"
+              className="btn btn-discret"
             >
               {t("common.cancel")}
             </Link>
@@ -531,7 +535,11 @@ export default function ActivityForm() {
                 type="submit"
                 value={currentStatus}
                 disabled={saving || noTypes}
-                className="px-4 py-2 rounded-md border border-indigo-600 text-indigo-600 hover:bg-indigo-50 disabled:opacity-50"
+                className={`btn ${
+                  currentStatus === "published"
+                    ? "btn-principal"
+                    : "btn-contour"
+                }`}
               >
                 {t("common.save")}
               </button>
@@ -540,7 +548,7 @@ export default function ActivityForm() {
                 type="submit"
                 value="draft"
                 disabled={saving || noTypes}
-                className="px-4 py-2 rounded-md border border-indigo-600 text-indigo-600 hover:bg-indigo-50 disabled:opacity-50"
+                className="btn btn-contour"
               >
                 {t("form.saveDraft")}
               </button>
@@ -550,7 +558,7 @@ export default function ActivityForm() {
                 type="submit"
                 value="published"
                 disabled={saving || noTypes}
-                className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
+                className="btn btn-principal"
               >
                 {isEdit ? t("form.saveAndPublish") : t("form.publish")}
               </button>
